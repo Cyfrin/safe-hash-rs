@@ -1,0 +1,15 @@
+[workspace]
+resolver = "2"
+
+members = [ 
+    "crates/safe-utils",
+    "crates/verifier",
+]
+
+
+[workspace.dependencies]
+semver = "1.0"
+alloy = { version = "0.11.1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+clap = { version = "4.5.31", features = ["derive"] }
+serde_json = "1"

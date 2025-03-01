@@ -1,0 +1,8 @@
+[package]
+name = "safe-utils"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+semver.workspace = true
+alloy.workspace = true
