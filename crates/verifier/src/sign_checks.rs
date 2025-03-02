@@ -69,6 +69,6 @@ pub fn handle_checks_for_signing(
         "<bold>Verify the above value as the Safe Tx Hash when signing the message from the ledger.</bold>"
     );
     println!(
-        "This also assumes that you are happy with the Tenderly simulation and you are okay with signing the same."
-    )
+        "This also assumes that you are happy with the Tenderly simulation and you are okay with signing the same.\n"
+    );
 }
