@@ -1,5 +1,8 @@
 # Local Safe Tx Verifier
 
+> [!CAUTION]
+> It is under development and is not fully tested. Please do not use it in production environments.
+
 ## Usage
 
 There are typically 2 things we do in safe wallets. Signing messages and Executing transactions (when signer threshold is met).
@@ -27,6 +30,10 @@ Options:
 ./verifier -s 0x1111100000000000000000000000000011111111 -c arbitrum -n 1 -t tx.json --check-for-signing
 ```
 Before signing the transaction in the ledger, make sure the safe tx hash matches based on the simulation input in tenderly.
+
+## Roadmap
+
+You can find a more detailed list in the [pinned GitHub issue](https://github.com/cyfrin/safe-tx-verifier/issues/1).
 
 ## Trust Assumptions
 * Safe Smart contracts are flawless
