@@ -1,11 +1,11 @@
 use alloy::{
     hex,
-    primitives::{Address, U256, keccak256},
+    primitives::{Address, ChainId, U256, keccak256},
 };
 
-use crate::tx_file::TenderlyTxInput;
+use crate::{etherscan::is_contract_verfied, tx_file::TenderlyTxInput};
 
-pub fn warn_suspicious_content(tx_data: &TenderlyTxInput) {
+pub fn warn_suspicious_content(tx_data: &TenderlyTxInput, chain_id: ChainId) {
     let mut warnings = vec![];
 
     // Check for delegate call
@@ -40,9 +40,16 @@ pub fn warn_suspicious_content(tx_data: &TenderlyTxInput) {
         warnings.push("Suspicious calldata found. It may potentially modify the owners or the threshold of the safe.");
     }
 
+    // Check `to` address contract verification status
+    if let Ok(is_verified) = is_contract_verfied(&tx_data.to.to_string(), chain_id) {
+        if !is_verified && !tx_data.data.is_empty() {
+            warnings.push("Transaction data is not empty and the `to` address is not verified.");
+        }
+    }
+
     // Print warnings
     if !warnings.is_empty() {
-        println!("\nWARNINGS:\n");
+        println!("WARNINGS\n");
         warnings.iter().for_each(|line| println!("{}\n", line));
     }
 }

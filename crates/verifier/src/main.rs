@@ -1,4 +1,5 @@
 mod cli;
+mod etherscan;
 mod exec_checks;
 mod message_checks;
 mod sign_checks;
@@ -45,13 +46,10 @@ fn main() {
         }
 
         // Suspicious content warning
-        warn_suspicious_content(&tx_data);
+        warn_suspicious_content(&tx_data, chain_id);
     }
 
     if args.check_for_message_hash {
         handle_checks_for_message_hash(&args, chain_id, args.safe_version.clone());
     }
-
-    // TODO:
-    // - Check if to contract is verified on Etherscan when data is not empty ?
 }
