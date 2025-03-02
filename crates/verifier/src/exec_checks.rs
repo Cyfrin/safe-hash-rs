@@ -1,6 +1,9 @@
 use crate::tx_file::TenderlyTxInput;
 use alloy::hex;
+use cli_table::{Cell, Style, Table};
+use color_print::{cprintln, cstr};
 use safe_utils::ExecuteTxHasher;
+use sty::{magenta_bright, underline};
 
 pub fn handle_checks_for_executing(tx_data: &TenderlyTxInput) {
     let execute_tx_hasher = ExecuteTxHasher::new(
@@ -18,8 +21,26 @@ pub fn handle_checks_for_executing(tx_data: &TenderlyTxInput) {
     let calldata = execute_tx_hasher.calldata();
     let calldata_hash = execute_tx_hasher.calldata_hash();
 
-    println!("Assuming we have the required amount of signers, following would hold:");
-    println!("Execution Calldata      :{}", hex::encode(calldata));
-    println!("Execution Calldata Hash :{}", hex::encode(calldata_hash));
+    println!("{}", sty::sty!("EXECUTION CHECKS", [magenta_bright, underline]));
     println!();
+
+    // Print hashes
+    let table =
+        vec![vec![cstr!("<green>Calldata hash</>").cell(), hex::encode(calldata_hash).cell()]]
+            .table()
+            .title(vec![
+                cstr!("<cyan>TYPE</>").cell().bold(true),
+                cstr!("<cyan>CALCULATED VALUES</cyan>").cell().bold(true),
+            ])
+            .bold(true);
+
+    let table_display = table.display().unwrap();
+    println!("{}", table_display);
+
+    cprintln!("<green><bold>Calldata</></>");
+    println!("{}\n", hex::encode(calldata));
+
+    cprintln!(
+        "<bold>Verify the above calldata as you sign when executing the transaction from the ledger.</bold>\n"
+    );
 }
