@@ -1,12 +1,10 @@
-use crate::Result;
+use crate::{Result, SafeWalletVersion};
 
 use alloy::{
     dyn_abi::DynSolValue,
     hex,
     primitives::{Address, B256, ChainId, U256, eip191_hash_message, keccak256},
 };
-
-use crate::SafeWalletVersion;
 
 pub struct DomainHasher {
     safe_version: SafeWalletVersion,
