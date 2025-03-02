@@ -5,7 +5,7 @@ use alloy::{
 use safe_utils::*;
 
 #[test]
-fn test_hasher() {
+fn test_signing_hasher() {
     let to = address!("0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9");
     let chain_id = ChainId::of("sepolia").expect("failed to find sepolia's chain id");
     let nonce = 6;
@@ -41,5 +41,23 @@ fn test_hasher() {
 
 #[test]
 fn test_execution_hasher() {
-    //ExecuteTxHasher::calldata();
+    let to = address!("0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9");
+
+    let executor = ExecuteTxHasher::new(
+        to,
+        U256::ZERO,
+        "0x095ea7b3000000000000000000000000fe2f653f6579de62aaf8b186e618887d03fa31260000000000000000000000000000000000000000000000000000000000000001".to_string(),
+        0,
+        U256::ZERO,
+        U256::ZERO,
+        U256::ZERO,
+        Address::ZERO,
+        Address::ZERO,
+        "0x13b45080c8c2bf4df80f215bd6db3a685d44e884e152f210d33a710e8c4a0cd7690a0870ff4b6c91caace6805c3089e969127bda662115303e2b4d32613e30161c52e3137647687bbfc1d4df0be44431dae7b6192f4cf94e17395e866cc8a799c260c88ffd7f82d6f5f63305b729090a580558f57b05671daee5bb3fa249c691c71b".to_string(),
+    );
+
+    assert_eq!(
+        executor.calldata_hash().to_string(),
+        "0xf618babd29e892fab850c54beeb23fa111479553afcd3f549f0f1a69dbd24a98".to_string()
+    );
 }
