@@ -17,7 +17,7 @@ fn test_hasher() {
     // Optional
     let data = CallDataHasher::new("0x095ea7b3000000000000000000000000fe2f653f6579de62aaf8b186e618887d03fa31260000000000000000000000000000000000000000000000000000000000000001".to_string());
 
-    let message_hasher = MessageHasher::new(
+    let message_hasher = TxMessageHasher::new(
         safe_version.clone(),
         to,
         U256::ZERO,
@@ -31,7 +31,7 @@ fn test_hasher() {
         U256::from(nonce),
     );
     let domain_hasher = DomainHasher::new(safe_version, chain_id, safe_contract);
-    let safe_hasher = SafeTxHasher::new(domain_hasher.hash(), message_hasher.hash());
+    let safe_hasher = SafeHasher::new(domain_hasher.hash(), message_hasher.hash());
     let readable_hash = hex::encode(safe_hasher.hash());
     assert_eq!(
         readable_hash,

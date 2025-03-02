@@ -3,7 +3,7 @@ use alloy::{
     hex,
     primitives::{ChainId, U256},
 };
-use safe_utils::{CallDataHasher, DomainHasher, MessageHasher, SafeTxHasher, SafeWalletVersion};
+use safe_utils::{CallDataHasher, DomainHasher, SafeHasher, SafeWalletVersion, TxMessageHasher};
 
 pub fn handle_checks_for_signing(
     tx_data: &TenderlyTxInput,
@@ -22,7 +22,7 @@ pub fn handle_checks_for_signing(
             let calldata_hasher = CallDataHasher::new(tx_data.data.clone());
             calldata_hasher.hash().expect(&format!("unable to hash {:?}", tx_data.data))
         };
-        let message_hasher = MessageHasher::new(
+        let message_hasher = TxMessageHasher::new(
             safe_verion,
             tx_data.to,
             tx_data.value,
@@ -33,13 +33,13 @@ pub fn handle_checks_for_signing(
             tx_data.gas_price,
             tx_data.gas_token,
             tx_data.refund_receiver,
-            U256::from(args.nonce),
+            U256::from(args.nonce.expect("nonce is absent")),
         );
         message_hasher.hash()
     };
 
     let safe_hash = {
-        let safe_hasher = SafeTxHasher::new(domain_hash, message_hash);
+        let safe_hasher = SafeHasher::new(domain_hash, message_hash);
         safe_hasher.hash()
     };
 

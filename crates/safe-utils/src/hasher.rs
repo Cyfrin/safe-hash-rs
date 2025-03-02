@@ -18,7 +18,7 @@ pub struct CallDataHasher {
     calldata: String,
 }
 
-pub struct MessageHasher {
+pub struct TxMessageHasher {
     safe_version: SafeWalletVersion,
     to: Address,
     value: U256,
@@ -32,7 +32,7 @@ pub struct MessageHasher {
     nonce: U256,
 }
 
-pub struct SafeTxHasher {
+pub struct SafeHasher {
     domain_hash: B256,
     message_hash: B256,
 }
@@ -48,6 +48,10 @@ pub struct ExecuteTxHasher {
     gas_token: Address,
     refund_receiver: Address,
     signatures: String,
+}
+
+pub struct MessageHasher {
+    message: String,
 }
 
 impl DomainHasher {
@@ -88,7 +92,7 @@ impl CallDataHasher {
     }
 }
 
-impl MessageHasher {
+impl TxMessageHasher {
     pub fn new(
         safe_version: SafeWalletVersion,
         to: Address,
@@ -146,7 +150,7 @@ impl MessageHasher {
     }
 }
 
-impl SafeTxHasher {
+impl SafeHasher {
     pub fn new(domain_hash: B256, message_hash: B256) -> Self {
         Self { domain_hash, message_hash }
     }
@@ -204,5 +208,25 @@ impl ExecuteTxHasher {
 
     pub fn calldata_hash(&self) -> B256 {
         keccak256(self.calldata())
+    }
+}
+
+impl MessageHasher {
+    pub fn new(message: String) -> Self {
+        Self { message }
+    }
+    pub fn hash(&self) -> B256 {
+        keccak256(
+            DynSolValue::Tuple(vec![
+                DynSolValue::FixedBytes(keccak256("SafeMessage(bytes message)"), 32),
+                DynSolValue::FixedBytes(
+                    keccak256(
+                        DynSolValue::FixedBytes(keccak256(self.message.clone()), 32).abi_encode(),
+                    ),
+                    32,
+                ),
+            ])
+            .abi_encode(),
+        )
     }
 }
