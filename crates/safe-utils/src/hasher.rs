@@ -37,6 +37,7 @@ pub struct SafeHasher {
     message_hash: B256,
 }
 
+#[derive(Debug)]
 pub struct ExecuteTxHasher {
     to: Address,
     value: U256,
@@ -190,20 +191,25 @@ impl ExecuteTxHasher {
         let function_selector = &keccak256(
             "execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)",
         )[..4];
-        let arguments = DynSolValue::Tuple(vec![
+
+        let data_bytes = hex::decode(self.data.clone()).expect("corrupted calldata");
+        let signature_bytes = hex::decode(self.signatures.clone()).expect("corrupted signature");
+
+        let encoded_arguments = DynSolValue::Tuple(vec![
             DynSolValue::Address(self.to),
             DynSolValue::Uint(self.value, 256),
-            DynSolValue::Bytes(self.data.clone().into()),
+            DynSolValue::Bytes(data_bytes),
             DynSolValue::Uint(U256::from(self.operation), 8),
             DynSolValue::Uint(U256::from(self.safe_tx_gas), 256),
             DynSolValue::Uint(U256::from(self.base_gas), 256),
             DynSolValue::Uint(U256::from(self.gas_price), 256),
             DynSolValue::Address(self.gas_token),
             DynSolValue::Address(self.refund_receiver),
-            DynSolValue::Bytes(self.signatures.clone().into()),
+            DynSolValue::Bytes(signature_bytes),
         ])
-        .abi_encode();
-        [function_selector, &arguments[..]].concat()
+        .abi_encode_params();
+
+        [function_selector, &encoded_arguments[..]].concat()
     }
 
     pub fn calldata_hash(&self) -> B256 {
