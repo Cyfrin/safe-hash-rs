@@ -2,6 +2,7 @@ use alloy::{
     hex,
     primitives::{Address, ChainId, U256, keccak256},
 };
+use sty::{red_bright, underline};
 
 use crate::{etherscan::is_contract_verfied, tx_file::TenderlyTxInput};
 
@@ -49,8 +50,8 @@ pub fn warn_suspicious_content(tx_data: &TenderlyTxInput, chain_id: ChainId) {
 
     // Print warnings
     if !warnings.is_empty() {
-        println!("WARNINGS\n");
-        warnings.iter().for_each(|line| println!("{}\n", line));
+        println!("{}\n", sty::sty!("WARNINGS", [red_bright, underline]));
+        warnings.iter().for_each(|line| println!("• {}\n", line));
     }
 }
 
