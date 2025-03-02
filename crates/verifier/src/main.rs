@@ -3,6 +3,7 @@ mod exec_checks;
 mod message_checks;
 mod sign_checks;
 mod tx_file;
+mod warn;
 
 use alloy::primitives::ChainId;
 use clap::Parser;
@@ -12,6 +13,7 @@ use message_checks::*;
 use safe_utils::Of;
 use sign_checks::*;
 use tx_file::TenderlyTxInput;
+use warn::warn_suspicious_content;
 
 fn main() {
     let args = CliArgs::parse();
@@ -43,10 +45,7 @@ fn main() {
         }
 
         // Suspicious content warning
-        if tx_data.operation == 1 {
-            println!();
-            println!("WARNING: delegatecall found in operation!");
-        }
+        warn_suspicious_content(&tx_data);
     }
 
     if args.check_for_message_hash {
