@@ -6,28 +6,28 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-  test:
-    name: Tests
-    runs-on: ubuntu-latest
-    steps:
+test:
+  name: Tests
+  runs-on: ubuntu-latest
+  steps:
 
-      - name: Checkout Sources
-        uses: actions/checkout@v4
+    - name: Checkout Sources
+      uses: actions/checkout@v4
 
-      - name: Install Rust Nightly (2025-01-01)
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: nightly-2025-01-01
-          override: true
+    - name: Install Rust Nightly (2025-01-01)
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: nightly-2025-01-01
+        override: true
 
-      - name: Checkout Sources
-        uses: actions/checkout@v4
+    - name: Checkout Sources
+      uses: actions/checkout@v4
 
-      - name: Restore Rust Cache
-        uses: Swatinem/rust-cache@v2
+    - name: Restore Rust Cache
+      uses: Swatinem/rust-cache@v2
 
-      - name: Run tests
-        run: |
-          cargo build
-          cargo test -- --nocapture
+    - name: Run tests
+      run: |
+        cargo build
+        cargo test -- --nocapture
