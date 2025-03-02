@@ -11,4 +11,7 @@ serde_json.workspace = true
 clap.workspace = true
 reqwest.workspace = true
 tokio.workspace = true
+color-print.workspace = true
+cli-table.workspace = true
+sty.workspace = true
 safe-utils = { path = "../safe-utils"}

@@ -1,8 +1,11 @@
 use crate::{cli::CliArgs, tx_file::TenderlyTxInput};
+use ::sty::{magenta_bright, underline};
 use alloy::{
     hex,
     primitives::{ChainId, U256},
 };
+use cli_table::{Cell, Style, Table};
+use color_print::{cprintln, cstr};
 use safe_utils::{CallDataHasher, DomainHasher, SafeHasher, SafeWalletVersion, TxMessageHasher};
 
 pub fn handle_checks_for_signing(
@@ -43,10 +46,29 @@ pub fn handle_checks_for_signing(
         safe_hasher.hash()
     };
 
-    // Output hashes
-    println!("Calculated hashes");
-    println!("Domain Hash           :{}", hex::encode(domain_hash));
-    println!("Message Hash          :{}", hex::encode(message_hash));
-    println!("Safe Transaction Hash :{}", hex::encode(safe_hash));
-    println!()
+    println!("{}", sty::sty!("SIGNATURE CHECKS", [magenta_bright, underline]));
+    println!();
+
+    // Print hashes
+    let table = vec![
+        vec![cstr!("<green>Domain Hash</>").cell(), hex::encode(domain_hash).cell()],
+        vec![cstr!("<green>Message Hash</>").cell(), hex::encode(message_hash).cell()],
+        vec![cstr!("<green>Safe Transaction Hash</>").cell(), hex::encode(safe_hash).cell()],
+    ]
+    .table()
+    .title(vec![
+        cstr!("<cyan>TYPE</>").cell().bold(true),
+        cstr!("<cyan>CALCULATED HASHES</cyan>").cell().bold(true),
+    ])
+    .bold(true);
+
+    let table_display = table.display().unwrap();
+    println!("{}", table_display);
+
+    cprintln!(
+        "<bold>Verify the above value as the Safe Tx Hash when signing the message from the ledger.</bold>"
+    );
+    println!(
+        "This also assumes that you are happy with the Tenderly simulation and you are okay with signing the same."
+    )
 }
