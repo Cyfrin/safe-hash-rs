@@ -3,7 +3,7 @@ use crate::Result;
 use alloy::{
     dyn_abi::DynSolValue,
     hex,
-    primitives::{Address, B256, ChainId, U256, keccak256},
+    primitives::{Address, B256, ChainId, U256, eip191_hash_message, keccak256},
 };
 
 use crate::SafeWalletVersion;
@@ -221,7 +221,8 @@ impl MessageHasher {
                 DynSolValue::FixedBytes(keccak256("SafeMessage(bytes message)"), 32),
                 DynSolValue::FixedBytes(
                     keccak256(
-                        DynSolValue::FixedBytes(keccak256(self.message.clone()), 32).abi_encode(),
+                        DynSolValue::FixedBytes(eip191_hash_message(self.message.clone()), 32)
+                            .abi_encode(),
                     ),
                     32,
                 ),
