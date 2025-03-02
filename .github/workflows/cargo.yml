@@ -2,10 +2,6 @@ on: [push, pull_request, workflow_dispatch]
 
 name: Verifier
 
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
-
 test:
   name: Tests
   runs-on: ubuntu-latest
