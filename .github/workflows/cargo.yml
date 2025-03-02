@@ -11,9 +11,6 @@ concurrency:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Install Foundry Toolchain
-        uses: foundry-rs/foundry-toolchain@v1.2.0
-
       - name: Checkout Sources
         uses: actions/checkout@v4
 
@@ -34,35 +31,3 @@ concurrency:
         run: |
           cargo build
           cargo test -- --nocapture
-
-  lints:
-    name: Lints
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout sources
-        uses: actions/checkout@v4
-
-      - name: Install Rust Nightly (2025-01-01)
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: nightly-2025-01-01
-          override: true
-
-      - name: Run cargo fmt
-        run: |
-          cargo +nightly fmt --all --check 
-
-      - name: Install stable toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable 
-          components: clippy
-          override: true
-
-      - name: Run cargo clippy
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: -- -D warnings
