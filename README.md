@@ -5,14 +5,10 @@
 
 ## Usage
 
-There are two main use cases for this tool:
-1. Verifying transaction hashes before signing (default)
-2. Verifying message hashes before signing
-
-This tool helps protect against possible phishing or compromised UI attacks by allowing local verification. 
+This tool helps protect against possible phishing or compromised UI attacks by allowing local verification of transaction hashes before signing.
 
 ```bash
-Usage: safe-hash [OPTIONS] --chain <CHAIN> --safe-address <safe_address>
+Usage: safe-hash [OPTIONS] --chain <CHAIN> --nonce <NONCE> --safe-address <safe_address> --to <ADDRESS>
 
 Options:
   -c, --chain <CHAIN>                  Chain - arbitrum, aurora, avalanche, base, blast, bsc, celo, ethereum, gnosis, linea, mantle, optimism, polygon, scroll, sepolia, worldchain, xlayer, zksync, base-sepolia, gnosis-chiado, polygon-zkevm
@@ -27,20 +23,15 @@ Options:
       --gas-price <AMOUNT>             Gas price in wei [default: 0]
       --gas-token <ADDRESS>            Address of gas payment token [default: 0x0]
       --refund-receiver <ADDRESS>      Address to receive gas payment [default: 0x0]
-      --tx-file <PATH>                 Use transaction data from Tenderly JSON file
-  -m, --message-file <PATH>           Path to message file for offchain message hashes
       --safe-version <VERSION>        Safe Contract version [default: 1.3.0]
-      --tx-signing                    Check transaction signing (default mode if none specified)
-      --msg-signing                   Check message signing
   -h, --help                         Print help
   -V, --version                      Print version
 ```
 
-## Examples 
+## Examples
 
-### Verify transaction before signing (default mode)
+### Verify transaction before signing
 
-Using manual parameters:
 ```bash
 # Basic transaction with just a target address and value
 ./safe-hash -s 0xSafeAddress -c ethereum -n 42 -t 0xTargetContract --value 1000000000000000000
@@ -51,21 +42,6 @@ Using manual parameters:
 # Transaction with custom gas parameters
 ./safe-hash -s 0xSafeAddress -c ethereum -n 42 -t 0xTargetContract --safe-tx-gas 100000 --base-gas 21000 --gas-price 50000000000
 ```
-
-Using Tenderly simulation data:
-```bash
-./safe-hash -s 0xSafeAddress -c ethereum -n 42 --tx-file tx-file.json
-```
-
-### Verify message before signing (not fully supported yet)
-
-```bash
-./safe-hash -s 0xSafeAddress -c ethereum -m message.txt --msg-signing
-```
-
-### NOTE
-
-> When using --tx-file, the JSON comes from the input section in Tenderly simulation of the respective action (sponsored by Safe). This will override any manually provided transaction parameters.
 
 ## Roadmap
 
