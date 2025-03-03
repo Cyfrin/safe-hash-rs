@@ -38,7 +38,7 @@ Before signing the transaction in the ledger, make sure the safe tx hash matches
 ### Verify before executing transactions
 
 ```bash
-./verifier -s 0xMultiSignContractAddress -c arbitrum -t tx-file.json --check-for-executing
+./verifier -t tx-file.json --check-for-executing
 ```
 Before signing to execute the transaction in the ledger, make sure the calldata matches 
 
