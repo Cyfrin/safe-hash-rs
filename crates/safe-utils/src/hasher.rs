@@ -130,7 +130,7 @@ impl TxMessageHasher {
                 "SafeTx(address to,uint256 value,bytes data,uint8 operation,uint256 safeTxGas,uint256 dataGas,uint256 gasPrice,address gasToken,address refundReceiver,uint256 nonce)",
             )
         };
-        return keccak256(
+        keccak256(
             DynSolValue::Tuple(vec![
                 DynSolValue::FixedBytes(typehash, 32),
                 self.to.into(),
@@ -145,7 +145,7 @@ impl TxMessageHasher {
                 self.nonce.into(),
             ])
             .abi_encode(),
-        );
+        )
     }
 }
 

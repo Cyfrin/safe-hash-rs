@@ -23,7 +23,7 @@ pub fn handle_checks_for_signing(
     let message_hash = {
         let calldata_hash = {
             let calldata_hasher = CallDataHasher::new(tx_data.data.clone());
-            calldata_hasher.hash().expect(&format!("unable to hash {:?}", tx_data.data))
+            calldata_hasher.hash().unwrap_or_else(|_| panic!("unable to hash {:?}", tx_data.data))
         };
         let message_hasher = TxMessageHasher::new(
             safe_verion,

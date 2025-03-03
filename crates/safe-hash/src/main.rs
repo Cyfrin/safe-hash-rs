@@ -45,7 +45,7 @@ fn main() {
 
         if args.check_for_signing {
             let chain_id = ChainId::of(&args.chain)
-                .expect(&format!("chain {:?} is supported but id is not found", args.chain));
+                .unwrap_or_else(|_| panic!("chain {:?} is supported but id is not found", args.chain));
 
             handle_checks_for_signing(&tx_data, &args, chain_id, args.safe_version.clone());
             warn_suspicious_content(&tx_data, Some(chain_id));
@@ -59,7 +59,7 @@ fn main() {
 
     if args.check_for_message_hash {
         let chain_id = ChainId::of(&args.chain)
-            .expect(&format!("chain {:?} is supported but id is not found", args.chain));
+            .unwrap_or_else(|_| panic!("chain {:?} is supported but id is not found", args.chain));
 
         handle_checks_for_message_hash(&args, chain_id, args.safe_version.clone());
     }
