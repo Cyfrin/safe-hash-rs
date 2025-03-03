@@ -16,12 +16,7 @@ pub fn handle_checks_for_signing(
 ) {
     // Calculate hashes
     let domain_hash = {
-        let domain_hasher = DomainHasher::new(
-            safe_verion.clone(),
-            chain_id,
-            args.safe_contract
-                .expect("safe contract not provided for checking the signing transaction"),
-        );
+        let domain_hasher = DomainHasher::new(safe_verion.clone(), chain_id, args.safe_address);
         domain_hasher.hash()
     };
 
@@ -41,7 +36,7 @@ pub fn handle_checks_for_signing(
             tx_data.gas_price,
             tx_data.gas_token,
             tx_data.refund_receiver,
-            U256::from(args.nonce.expect("nonce is absent")),
+            U256::from(args.nonce),
         );
         message_hasher.hash()
     };

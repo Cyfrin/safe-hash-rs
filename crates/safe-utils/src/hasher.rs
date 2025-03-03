@@ -9,7 +9,7 @@ use alloy::{
 pub struct DomainHasher {
     safe_version: SafeWalletVersion,
     chain_id: ChainId,
-    safe_contract: Address,
+    safe_address: Address,
 }
 
 pub struct CallDataHasher {
@@ -54,8 +54,8 @@ pub struct MessageHasher {
 }
 
 impl DomainHasher {
-    pub fn new(safe_version: SafeWalletVersion, chain_id: ChainId, safe_contract: Address) -> Self {
-        Self { safe_version, chain_id, safe_contract }
+    pub fn new(safe_version: SafeWalletVersion, chain_id: ChainId, safe_address: Address) -> Self {
+        Self { safe_version, chain_id, safe_address }
     }
     pub fn hash(&self) -> B256 {
         if self.safe_version >= SafeWalletVersion::new(1, 3, 0) {
@@ -66,7 +66,7 @@ impl DomainHasher {
                         32,
                     ),
                     DynSolValue::Uint(U256::from(self.chain_id), 256),
-                    self.safe_contract.into(),
+                    self.safe_address.into(),
                 ])
                 .abi_encode(),
             );
@@ -74,7 +74,7 @@ impl DomainHasher {
         keccak256(
             DynSolValue::Tuple(vec![
                 DynSolValue::FixedBytes(keccak256("EIP712Domain(address verifyingContract)"), 32),
-                self.safe_contract.into(),
+                self.safe_address.into(),
             ])
             .abi_encode(),
         )

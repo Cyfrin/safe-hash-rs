@@ -10,12 +10,12 @@ There are typically 2 things we do in safe wallets. Signing messages and Executi
 This tool helps verify those actions locally and hopefully protect against possible phishing or compromised UI attacks. 
 
 ```bash
-Usage: safe-hash [OPTIONS] --chain <CHAIN> --safe-contract <SAFE_CONTRACT>
+Usage: safe-hash [OPTIONS] --chain <CHAIN> --safe-address <safe_address>
 
 Options:
   -c, --chain <CHAIN>                  Chain - arbitrum, aurora, avalanche, base, blast, bsc, celo, ethereum, gnosis, linea, mantle, optimism, polygon, scroll, sepolia, worldchain, xlayer, zksync, base-sepolia, gnosis-chiado, polygon-zkevm
-  -n, --nonce <NONCE>                  Transaction nonce of the safe contract
-  -s, --safe-contract <SAFE_CONTRACT>  Address of the safe contract
+  -n, --nonce <NONCE>                  Transaction nonce of the safe address
+  -s, --safe-address <safe_address>  Address of the safe address
   -t, --tx-file <TX_FILE>              Path to JSON file containing the input from Tenderly's simulation summary
   -m, --message-file <MESSAGE_FILE>    Path to message file for offchain message hashes
       --safe-version <SAFE_VERSION>    Safe Contract version [default: 1.3.0]

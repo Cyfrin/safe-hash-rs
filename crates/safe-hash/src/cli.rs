@@ -13,11 +13,11 @@ pub struct CliArgs {
     #[arg(short, long, required = true)]
     pub chain: String,
 
-    /// Transaction nonce of the safe contract
+    /// Transaction nonce of the safe address
     #[arg(short, long, required = true)]
     pub nonce: u8,
 
-    /// Address of the safe contract
+    /// Address of the safe address
     #[arg(short = 's', long = "safe-address", required = true)]
     pub safe_address: Address,
 
@@ -34,7 +34,7 @@ pub struct CliArgs {
     )]
     pub tx_file: Option<PathBuf>,
 
-    /// Address of the contract to which the safe-contract sends calldata to.
+    /// Address of the contract to which the safe-address sends calldata to.
     #[arg(long, required_unless_present = "tx_file")]
     pub to: Option<Address>,
 
@@ -119,8 +119,13 @@ impl CliArgs {
     }
 
     pub fn validate_transaction_params(&self) {
-        if (self.check_for_signing || self.check_for_executing) && self.tx_file.is_none() && self.to.is_none() {
-            eprintln!("Either tx-file or 'to' address must be specified when checking for signing or executing");
+        if (self.check_for_signing || self.check_for_executing)
+            && self.tx_file.is_none()
+            && self.to.is_none()
+        {
+            eprintln!(
+                "Either tx-file or 'to' address must be specified when checking for signing or executing"
+            );
             std::process::exit(1);
         }
     }

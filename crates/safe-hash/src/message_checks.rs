@@ -12,12 +12,7 @@ pub fn handle_checks_for_message_hash(
 ) {
     // Calculate hashes
     let domain_hash = {
-        let domain_hasher = DomainHasher::new(
-            safe_verion.clone(),
-            chain_id,
-            args.safe_contract
-                .expect("safe contract not provided for checking the signing of a message"),
-        );
+        let domain_hasher = DomainHasher::new(safe_verion.clone(), chain_id, args.safe_address);
         domain_hasher.hash()
     };
 
