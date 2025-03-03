@@ -1,12 +1,10 @@
-use std::env::VarError;
-
+use crate::{etherscan::is_contract_verfied, tx_file::TenderlyTxInput};
 use alloy::{
     hex,
     primitives::{Address, ChainId, U256, keccak256},
 };
+use std::env::VarError;
 use sty::{red_bright, underline};
-
-use crate::{etherscan::is_contract_verfied, tx_file::TenderlyTxInput};
 
 pub fn warn_suspicious_content(tx_data: &TenderlyTxInput, chain_id: Option<ChainId>) {
     let mut warnings = vec![];
