@@ -9,7 +9,6 @@ mod warn;
 use alloy::primitives::ChainId;
 use clap::Parser;
 use cli::CliArgs;
-use exec_checks::*;
 use message_checks::*;
 use safe_utils::Of;
 use sign_checks::*;
@@ -23,7 +22,7 @@ fn main() {
     args.validate_message_hash();
     args.validate_transaction_params();
 
-    if args.tx_signing || args.tx_executing {
+    if args.tx_signing {
         let tx_data: TxInput = if let Some(tx_file) = &args.tx_file {
             let tx_json = std::fs::read_to_string(tx_file)
                 .expect(&format!("unable to read file: {:?}", tx_file));
@@ -41,22 +40,15 @@ fn main() {
                 args.gas_price,
                 args.gas_token,
                 args.refund_receiver,
-                args.signatures.clone().unwrap_or_default(),
+                String::new(), // No signatures needed for signing
             )
         };
 
-        if args.tx_signing {
-            let chain_id = ChainId::of(&args.chain)
-                .expect(&format!("chain {:?} is supported but id is not found", args.chain));
+        let chain_id = ChainId::of(&args.chain)
+            .expect(&format!("chain {:?} is supported but id is not found", args.chain));
 
-            handle_checks_for_signing(&tx_data, &args, chain_id, args.safe_version.clone());
-            warn_suspicious_content(&tx_data, Some(chain_id));
-        }
-        if args.tx_executing {
-            handle_checks_for_executing(&tx_data);
-            let chain_id = ChainId::of(&args.chain).ok();
-            warn_suspicious_content(&tx_data, chain_id);
-        }
+        handle_checks_for_signing(&tx_data, &args, chain_id, args.safe_version.clone());
+        warn_suspicious_content(&tx_data, Some(chain_id));
     }
 
     if args.msg_signing {

@@ -25,17 +25,8 @@ pub struct CliArgs {
     #[arg(short = 'u', long, default_value = "1.3.0")]
     pub safe_version: SafeWalletVersion,
 
-    /// Path to JSON file containing all the transaction data
-    /// If provided, this will override any manually provided transaction parameters
-    #[arg(
-        short,
-        long,
-        conflicts_with_all=["to", "value", "data", "operation", "safe_tx_gas", "base_gas", "gas_price", "gas_token", "refund_receiver"]
-    )]
-    pub tx_file: Option<PathBuf>,
-
     /// Address of the contract to which the safe-address sends calldata to.
-    #[arg(long, required_unless_present = "tx_file")]
+    #[arg(short, long, required_unless_present = "tx_file")]
     pub to: Option<Address>,
 
     /// Value asked in the transaction (relates to eth)
@@ -43,7 +34,7 @@ pub struct CliArgs {
     pub value: U256,
 
     /// Raw calldata encoded in hex
-    #[arg(long, default_value = "0x")]
+    #[arg(short, long, default_value = "0x")]
     pub data: String,
 
     /// Call or delegate call (0 or 1)
@@ -65,9 +56,13 @@ pub struct CliArgs {
     #[arg(long, default_value_t = Address::ZERO)]
     pub refund_receiver: Address,
 
-    /// Required when checking for execution
-    #[arg(long)]
-    pub signatures: Option<String>,
+    /// Path to JSON file containing all the transaction data
+    /// If provided, this will override any manually provided transaction parameters
+    #[arg(
+        long,
+        conflicts_with_all=["to", "value", "data", "operation", "safe_tx_gas", "base_gas", "gas_price", "gas_token", "refund_receiver"]
+    )]
+    pub tx_file: Option<PathBuf>,
 
     /// Path to message file containing message in plain text
     #[arg(short, long)]
@@ -76,10 +71,6 @@ pub struct CliArgs {
     /// Check transaction signing (default if no mode specified)
     #[arg(long = "tx-signing", group = "mode", default_value_t = true)]
     pub tx_signing: bool,
-
-    /// Check transaction execution
-    #[arg(long = "tx-executing", group = "mode")]
-    pub tx_executing: bool,
 
     /// Check message signing
     #[arg(long = "msg-signing", group = "mode")]
@@ -110,8 +101,8 @@ impl CliArgs {
     }
 
     pub fn validate_transaction_params(&self) {
-        if (self.tx_signing || self.tx_executing) && self.tx_file.is_none() && self.to.is_none() {
-            eprintln!("Either tx-file or 'to' address must be specified when checking for signing or executing");
+        if self.tx_signing && self.tx_file.is_none() && self.to.is_none() {
+            eprintln!("Either tx-file or 'to' address must be specified when checking for signing");
             std::process::exit(1);
         }
     }
