@@ -10,7 +10,7 @@ There are typically 2 things we do in safe wallets. Signing messages and Executi
 This tool helps verify those actions locally and hopefully protect against possible phishing or compromised UI attacks. 
 
 ```bash
-Usage: verifier [OPTIONS] --chain <CHAIN> --safe-contract <SAFE_CONTRACT>
+Usage: safe-hash [OPTIONS] --chain <CHAIN> --safe-contract <SAFE_CONTRACT>
 
 Options:
   -c, --chain <CHAIN>                  Chain - arbitrum, aurora, avalanche, base, blast, bsc, celo, ethereum, gnosis, linea, mantle, optimism, polygon, scroll, sepolia, worldchain, xlayer, zksync, base-sepolia, gnosis-chiado, polygon-zkevm
@@ -31,20 +31,20 @@ Options:
 ### Verify before signing transactions
 
 ```bash
-./verifier -s 0xMultiSigAddress -c arbitrum -n 5 -t tx-file.json --check-for-signing
+./safe-hash -s 0xMultiSigAddress -c arbitrum -n 5 -t tx-file.json --check-for-signing
 ```
 Before signing the transaction in the ledger, make sure the safe tx hash matches 
 
 ### Verify before executing transactions
 
 ```bash
-./verifier -t tx-file.json --check-for-executing
+./safe-hash -t tx-file.json --check-for-executing
 ```
 Before signing to execute the transaction in the ledger, make sure the calldata matches 
 
 ### Verify off chain signed messages
 ```bash
-./verifier -s 0xMultiSigAddress -c arbitrum -m message-file.txt --check-for-message-hash
+./safe-hash -s 0xMultiSigAddress -c arbitrum -m message-file.txt --check-for-message-hash
 ```
 
 ### NOTE

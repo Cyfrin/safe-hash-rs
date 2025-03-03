@@ -3,7 +3,7 @@ resolver = "2"
 
 members = [ 
     "crates/safe-utils",
-    "crates/verifier",
+    "crates/safe-hash",
 ]
 
 
