@@ -42,9 +42,14 @@ Before signing the transaction in the ledger, make sure the safe tx hash matches
 ```
 Before signing to execute the transaction in the ledger, make sure the calldata matches 
 
+### Verify Safe signed message off chain
+```bash
+./verifier - -s 0xMultiSigAddress -c arbitrum -m message-file.txt --check-for-message-hash
+```
+
 ### NOTE
 
-> tx-file.json comes from the Simulation in Tenderly that Safe UI provides
+> tx-file.json comes from the input section in Tenderly simulation of the repsective action (sponsored by Safe)
 
 ## Roadmap
 
