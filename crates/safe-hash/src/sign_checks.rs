@@ -1,12 +1,6 @@
 use crate::{cli::CliArgs, output::SafeHashes, tx_file::TxInput};
-use alloy::{
-    hex,
-    primitives::{Address, ChainId, FixedBytes, U256},
-};
-use safe_utils::{
-    CallDataHasher, DomainHasher, Of, SafeHasher, SafeWalletVersion, TxMessageHasher,
-};
-use std::str::FromStr;
+use alloy::primitives::{ChainId, U256};
+use safe_utils::{CallDataHasher, DomainHasher, SafeHasher, SafeWalletVersion, TxMessageHasher};
 
 pub fn handle_checks_for_signing(
     tx_data: &TxInput,
@@ -52,7 +46,9 @@ pub fn handle_checks_for_signing(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloy::primitives::FixedBytes;
+    use alloy::primitives::{Address, ChainId, FixedBytes, U256, hex};
+    use safe_utils::{Of, SafeWalletVersion};
+    use std::str::FromStr;
 
     #[test]
     fn test_handle_checks_for_signing() {
