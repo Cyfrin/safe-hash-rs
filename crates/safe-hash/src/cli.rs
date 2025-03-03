@@ -1,7 +1,6 @@
 use alloy::primitives::{Address, U256};
 use clap::Parser;
 use safe_utils::{SafeWalletVersion, get_all_supported_chain_names};
-use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -26,8 +25,8 @@ pub struct CliArgs {
     pub safe_version: SafeWalletVersion,
 
     /// Address of the contract to which the safe-address sends calldata to.
-    #[arg(short, long, required_unless_present = "tx_file")]
-    pub to: Option<Address>,
+    #[arg(short, long, required = true)]
+    pub to: Address,
 
     /// Value asked in the transaction (relates to eth)
     #[arg(long, default_value_t = U256::ZERO)]
@@ -55,26 +54,6 @@ pub struct CliArgs {
 
     #[arg(long, default_value_t = Address::ZERO)]
     pub refund_receiver: Address,
-
-    /// Path to JSON file containing all the transaction data
-    /// If provided, this will override any manually provided transaction parameters
-    #[arg(
-        long,
-        conflicts_with_all=["to", "value", "data", "operation", "safe_tx_gas", "base_gas", "gas_price", "gas_token", "refund_receiver"]
-    )]
-    pub tx_file: Option<PathBuf>,
-
-    /// Path to message file containing message in plain text
-    #[arg(short, long)]
-    pub message_file: Option<PathBuf>,
-
-    /// Check transaction signing (default if no mode specified)
-    #[arg(long = "tx-signing", group = "mode", default_value_t = true)]
-    pub tx_signing: bool,
-
-    /// Check message signing
-    #[arg(long = "msg-signing", group = "mode")]
-    pub msg_signing: bool,
 }
 
 impl CliArgs {
@@ -89,20 +68,6 @@ impl CliArgs {
     pub fn validate_safe_version(&self) {
         if self.safe_version < SafeWalletVersion::new(0, 1, 0) {
             eprintln!("{} version of Safe Wallet is not supported", self.safe_version);
-            std::process::exit(1);
-        }
-    }
-
-    pub fn validate_message_hash(&self) {
-        if self.msg_signing && self.message_file.is_none() {
-            eprintln!("message file must be specified when checking for message signing");
-            std::process::exit(1);
-        }
-    }
-
-    pub fn validate_transaction_params(&self) {
-        if self.tx_signing && self.tx_file.is_none() && self.to.is_none() {
-            eprintln!("Either tx-file or 'to' address must be specified when checking for signing");
             std::process::exit(1);
         }
     }
@@ -126,12 +91,6 @@ mod tests {
         ]
     }
 
-    fn tx_file_args() -> Vec<String> {
-        let mut args = base_args();
-        args.extend_from_slice(&["--tx-file".to_string(), "tx.json".to_string()]);
-        args
-    }
-
     fn manual_args() -> Vec<String> {
         let mut args = base_args();
         args.extend_from_slice(&[
@@ -144,68 +103,16 @@ mod tests {
     }
 
     #[test]
-    fn test_tx_signing_with_manual_params() {
+    fn test_manual_params() {
         let args = manual_args();
 
         let cli = CliArgs::try_parse_from(&args).unwrap();
-        assert!(cli.tx_signing);
-        assert!(!cli.msg_signing);
         assert_eq!(cli.chain, "ethereum");
         assert_eq!(cli.nonce, 42);
         assert_eq!(cli.safe_address, address!("0x1234567890123456789012345678901234567890"));
-        assert_eq!(cli.to.unwrap(), address!("0x2234567890123456789012345678901234567890"));
+        assert_eq!(cli.to, address!("0x2234567890123456789012345678901234567890"));
         assert_eq!(cli.value, U256::from(0));
         assert_eq!(cli.data, "0xabcd");
-    }
-
-    #[test]
-    fn test_tx_signing_with_tx_file() {
-        let args = tx_file_args();
-
-        let cli = CliArgs::try_parse_from(&args).unwrap();
-        assert!(cli.tx_signing);
-        assert!(!cli.msg_signing);
-        assert!(cli.tx_file.is_some());
-        assert_eq!(cli.tx_file.unwrap().to_str().unwrap(), "tx.json");
-    }
-
-    // #[test]
-    // fn test_msg_signing() {
-    //     let mut args = base_args();
-    //     args.extend_from_slice(&[
-    //         "--msg-signing".to_string(),
-    //         "--message-file".to_string(),
-    //         "message.txt".to_string(),
-    //     ]);
-
-    //     let cli = CliArgs::try_parse_from(&args).unwrap();
-    //     assert!(!cli.tx_signing);
-    //     assert!(cli.msg_signing);
-    //     assert!(cli.message_file.is_some());
-    //     assert_eq!(cli.message_file.unwrap().to_str().unwrap(), "message.txt");
-    // }
-
-    #[test]
-    fn test_tx_file_conflicts_with_manual_params() {
-        let mut args = base_args();
-        args.extend_from_slice(&[
-            "--tx-file".to_string(),
-            "tx.json".to_string(),
-            "--to".to_string(),
-            "0x2234567890123456789012345678901234567890".to_string(),
-        ]);
-
-        let result = CliArgs::try_parse_from(&args);
-        assert!(result.is_err());
-    }
-
-    #[test]
-    fn test_modes_are_mutually_exclusive() {
-        let mut args = base_args();
-        args.extend_from_slice(&["--tx-signing".to_string(), "--msg-signing".to_string()]);
-
-        let result = CliArgs::try_parse_from(&args);
-        assert!(result.is_err());
     }
 
     #[test]
