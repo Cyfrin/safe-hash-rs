@@ -35,15 +35,15 @@ pub struct CliArgs {
     pub safe_version: SafeWalletVersion,
 
     /// Check for signing the transaction
-    #[arg(long)]
+    #[arg(long, group = "check_for")]
     pub check_for_signing: bool,
 
     /// Check for executing the transaction
-    #[arg(long)]
+    #[arg(long, group = "check_for")]
     pub check_for_executing: bool,
 
     /// Check message hashes off-chain
-    #[arg(long)]
+    #[arg(long, group = "check_for")]
     pub check_for_message_hash: bool,
 }
 
@@ -56,7 +56,15 @@ impl CliArgs {
                 std::process::exit(1);
             }
         } else if self.check_for_signing || self.check_for_message_hash {
-            eprintln!("--chain is required when checking for signing tx or message hash");
+            eprintln!("chain needs to be specified when checking for signing tx or message hash");
+            std::process::exit(1);
+        }
+    }
+    pub fn validate_safe_contract(&self) {
+        if self.safe_contract.is_none() && (self.check_for_signing || self.check_for_message_hash) {
+            eprintln!(
+                "safe-contract needs to specified when checking for signing tx or message hash"
+            );
             std::process::exit(1);
         }
     }

@@ -19,6 +19,7 @@ use warn::warn_suspicious_content;
 fn main() {
     let args = CliArgs::parse();
     args.validate_safe_version();
+    args.validate_safe_contract();
     args.validate_chain();
     args.validate_checks_asked();
     args.validate_nonce();
