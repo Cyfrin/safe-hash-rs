@@ -6,7 +6,7 @@ use sty::{red_bright, underline};
 
 use crate::{etherscan::is_contract_verfied, tx_file::TenderlyTxInput};
 
-pub fn warn_suspicious_content(tx_data: &TenderlyTxInput, chain_id: ChainId) {
+pub fn warn_suspicious_content(tx_data: &TenderlyTxInput, chain_id: Option<ChainId>) {
     let mut warnings = vec![];
 
     // Check for delegate call
@@ -42,7 +42,9 @@ pub fn warn_suspicious_content(tx_data: &TenderlyTxInput, chain_id: ChainId) {
     }
 
     // Check `to` address contract verification status
-    if let Ok(is_verified) = is_contract_verfied(&tx_data.to.to_string(), chain_id) {
+    if let Some(Ok(is_verified)) =
+        chain_id.map(|chain_id| is_contract_verfied(&tx_data.to.to_string(), chain_id))
+    {
         if !is_verified && !tx_data.data.is_empty() {
             warnings.push("Transaction data is not empty and the `to` address is not verified.");
         }

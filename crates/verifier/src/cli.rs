@@ -12,7 +12,7 @@ pub struct CliArgs {
     /// mantle, optimism, polygon, scroll, sepolia, worldchain, xlayer, zksync, base-sepolia,
     /// gnosis-chiado, polygon-zkevm
     #[arg(short, long)]
-    pub chain: String,
+    pub chain: Option<String>,
 
     /// Transaction nonce of the safe contract
     #[arg(short, long)]
@@ -20,7 +20,7 @@ pub struct CliArgs {
 
     /// Address of the safe contract
     #[arg(short, long)]
-    pub safe_contract: Address,
+    pub safe_contract: Option<Address>,
 
     /// Path to JSON file containing the input from Tenderly's simulation summary
     #[arg(short, long)]
@@ -50,9 +50,11 @@ pub struct CliArgs {
 impl CliArgs {
     pub fn validate_chain(&self) {
         let valid_names = get_all_supported_chain_names();
-        if !valid_names.contains(&self.chain) {
-            eprintln!("chain {:?} is not supported", self.chain);
-            std::process::exit(1);
+        if let Some(chain) = &self.chain {
+            if !valid_names.contains(chain) {
+                eprintln!("chain {:?} is not supported", self.chain);
+                std::process::exit(1);
+            }
         }
     }
     pub fn validate_checks_asked(&self) {

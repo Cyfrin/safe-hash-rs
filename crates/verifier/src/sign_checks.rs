@@ -16,7 +16,12 @@ pub fn handle_checks_for_signing(
 ) {
     // Calculate hashes
     let domain_hash = {
-        let domain_hasher = DomainHasher::new(safe_verion.clone(), chain_id, args.safe_contract);
+        let domain_hasher = DomainHasher::new(
+            safe_verion.clone(),
+            chain_id,
+            args.safe_contract
+                .expect("safe contract not provided for checking the signing transaction"),
+        );
         domain_hasher.hash()
     };
 
