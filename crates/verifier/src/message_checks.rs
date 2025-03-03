@@ -1,6 +1,9 @@
 use crate::cli::CliArgs;
 use alloy::{hex, primitives::ChainId};
+use cli_table::{Cell, Style, Table};
+use color_print::cstr;
 use safe_utils::{DomainHasher, MessageHasher, SafeHasher, SafeWalletVersion};
+use sty::{magenta_bright, underline};
 
 pub fn handle_checks_for_message_hash(
     args: &CliArgs,
@@ -32,10 +35,22 @@ pub fn handle_checks_for_message_hash(
         safe_hasher.hash()
     };
 
-    // Output hashes
-    println!("Calculated hashes");
-    println!("Domain Hash       :{}", hex::encode(domain_hash));
-    println!("Message Hash      :{}", hex::encode(message_hash));
-    println!("Safe Message Hash :{}", hex::encode(safe_hash));
-    println!()
+    println!("{}", sty::sty!("MESSAGE CHECKS", [magenta_bright, underline]));
+    println!();
+
+    // Print hashes
+    let table = vec![
+        vec![cstr!("<green>Domain Hash</>").cell(), hex::encode(domain_hash).cell()],
+        vec![cstr!("<green>Message Hash</>").cell(), hex::encode(message_hash).cell()],
+        vec![cstr!("<green>Safe Message Hash</>").cell(), hex::encode(safe_hash).cell()],
+    ]
+    .table()
+    .title(vec![
+        cstr!("<cyan>TYPE</>").cell().bold(true),
+        cstr!("<cyan>CALCULATED HASHES</cyan>").cell().bold(true),
+    ])
+    .bold(true);
+
+    let table_display = table.display().unwrap();
+    println!("{}\n", table_display);
 }
