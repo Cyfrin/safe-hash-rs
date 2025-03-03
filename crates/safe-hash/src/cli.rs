@@ -145,7 +145,7 @@ mod tests {
 
     #[test]
     fn test_tx_signing_with_manual_params() {
-        let mut args = manual_args();
+        let args = manual_args();
 
         let cli = CliArgs::try_parse_from(&args).unwrap();
         assert!(cli.tx_signing);
@@ -160,7 +160,7 @@ mod tests {
 
     #[test]
     fn test_tx_signing_with_tx_file() {
-        let mut args = tx_file_args();
+        let args = tx_file_args();
 
         let cli = CliArgs::try_parse_from(&args).unwrap();
         assert!(cli.tx_signing);

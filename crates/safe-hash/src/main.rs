@@ -25,9 +25,9 @@ fn main() {
     if args.tx_signing {
         let tx_data: TxInput = if let Some(tx_file) = &args.tx_file {
             let tx_json = std::fs::read_to_string(tx_file)
-                .expect(&format!("unable to read file: {:?}", tx_file));
+                .unwrap_or_else(|_| panic!("unable to read file: {:?}", tx_file));
             serde_json::from_str(&tx_json)
-                .expect(&format!("poorly formatted tx json in file: {:?}", tx_file))
+                .unwrap_or_else(|_| panic!("poorly formatted tx json in file: {:?}", tx_file))
         } else {
             let to = args.to.unwrap();
             TxInput::new(
@@ -45,7 +45,7 @@ fn main() {
         };
 
         let chain_id = ChainId::of(&args.chain)
-            .expect(&format!("chain {:?} is supported but id is not found", args.chain));
+            .unwrap_or_else(|_| panic!("chain {:?} is supported but id is not found", args.chain));
 
         handle_checks_for_signing(&tx_data, &args, chain_id, args.safe_version.clone());
         warn_suspicious_content(&tx_data, Some(chain_id));
@@ -53,7 +53,7 @@ fn main() {
 
     if args.msg_signing {
         let chain_id = ChainId::of(&args.chain)
-            .expect(&format!("chain {:?} is supported but id is not found", args.chain));
+            .unwrap_or_else(|_| panic!("chain {:?} is supported but id is not found", args.chain));
 
         handle_checks_for_message_hash(&args, chain_id, args.safe_version.clone());
     }
