@@ -25,9 +25,8 @@ pub fn warn_suspicious_content(tx_data: &TxInput, chain_id: Option<ChainId>) {
             "Custom refund receiver found for the transaction. Verify that this is intentional",
         );
     } else if tx_data.gas_token != Address::ZERO {
-        warnings.push(
-            "Custom gas token found for the transaction. Verify that this is intentional",
-        );
+        warnings
+            .push("Custom gas token found for the transaction. Verify that this is intentional");
     }
 
     if tx_data.gas_price != U256::ZERO {

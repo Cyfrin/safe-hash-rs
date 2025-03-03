@@ -46,12 +46,10 @@ Using manual parameters:
 ./safe-hash -s 0xSafeAddress -c ethereum -n 42 -t 0xTargetContract --value 1000000000000000000
 
 # Transaction with calldata (e.g., token transfer)
-./safe-hash -s 0xSafeAddress -c ethereum -n 42 -t 0xTokenContract \
-    -d 0xa9059cbb000000000000000000000000recipientAddress000000000000000000000000000000001
+./safe-hash -s 0xSafeAddress -c ethereum -n 42 -t 0xTokenContract -d 0xdatadatadata
 
 # Transaction with custom gas parameters
-./safe-hash -s 0xSafeAddress -c ethereum -n 42 -t 0xTargetContract \
-    --safe-tx-gas 100000 --base-gas 21000 --gas-price 50000000000
+./safe-hash -s 0xSafeAddress -c ethereum -n 42 -t 0xTargetContract --safe-tx-gas 100000 --base-gas 21000 --gas-price 50000000000
 ```
 
 Using Tenderly simulation data:
