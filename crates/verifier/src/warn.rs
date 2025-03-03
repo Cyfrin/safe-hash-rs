@@ -45,7 +45,7 @@ pub fn warn_suspicious_content(tx_data: &TenderlyTxInput, chain_id: Option<Chain
 
     // Check `to` address contract verification status
     let f = &format!(
-        "Since the tx carries non zero value, check to see {} is a verified contract. Set ETHERSCAN_API_KEY for auto check",
+        "Since the tx carries non zero value, check to see {} is a verified contract. Set ETHERSCAN_API_KEY in env and specify the chain for auto check",
         tx_data.to.to_string()
     );
     if !tx_data.value.is_zero() {
