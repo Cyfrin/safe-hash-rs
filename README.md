@@ -42,9 +42,9 @@ Before signing the transaction in the ledger, make sure the safe tx hash matches
 ```
 Before signing to execute the transaction in the ledger, make sure the calldata matches 
 
-### Verify Safe signed message off chain
+### Verify off chain signed messages
 ```bash
-./verifier - -s 0xMultiSigAddress -c arbitrum -m message-file.txt --check-for-message-hash
+./verifier -s 0xMultiSigAddress -c arbitrum -m message-file.txt --check-for-message-hash
 ```
 
 ### NOTE
