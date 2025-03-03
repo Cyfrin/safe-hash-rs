@@ -31,7 +31,7 @@ Options:
 ### Verify before signing transactions
 
 ```bash
-./verifier -s 0xMultiSignContractAddress -c arbitrum -n NONCE -t tx-file.json --check-for-signing
+./verifier -s 0xMultiSigAddress -c arbitrum -n NONCE -t tx-file.json --check-for-signing
 ```
 Before signing the transaction in the ledger, make sure the safe tx hash matches 
 
