@@ -55,12 +55,15 @@ impl CliArgs {
                 eprintln!("chain {:?} is not supported", self.chain);
                 std::process::exit(1);
             }
+        } else if self.check_for_signing || self.check_for_message_hash {
+            eprintln!("--chain is required when checking for signing tx or message hash");
+            std::process::exit(1);
         }
     }
     pub fn validate_checks_asked(&self) {
         if !self.check_for_signing && !self.check_for_executing && !self.check_for_message_hash {
             eprintln!(
-                "please use at least one of --check-for-signing or --check-for-executing or --check-for-message-hash"
+                "please use one of --check-for-signing or --check-for-executing or --check-for-message-hash"
             );
             std::process::exit(1);
         }
