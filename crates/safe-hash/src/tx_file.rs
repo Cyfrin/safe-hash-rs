@@ -21,6 +21,33 @@ pub struct TxInput {
 }
 
 impl TxInput {
+    pub fn new(
+        to: Address,
+        value: U256,
+        data: String,
+        operation: u8,
+        safe_tx_gas: U256,
+        base_gas: U256,
+        gas_price: U256,
+        gas_token: Address,
+        refund_receiver: Address,
+        signatures: String,
+    ) -> Self {
+        Self {
+            to,
+            value,
+            data,
+            operation,
+            safe_tx_gas,
+            base_gas: Some(base_gas),
+            data_gas: None,
+            gas_price,
+            gas_token,
+            refund_receiver,
+            signatures,
+        }
+    }
+
     pub fn base_gas(&self) -> U256 {
         if let Some(base_gas) = self.base_gas {
             return base_gas;

@@ -9,7 +9,7 @@ fn test_signing_hasher() {
     let to = address!("0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9");
     let chain_id = ChainId::of("sepolia").expect("failed to find sepolia's chain id");
     let nonce = 6;
-    let safe_contract = address!("0x86D46EcD553d25da0E3b96A9a1B442ac72fa9e9F");
+    let safe_address = address!("0x86D46EcD553d25da0E3b96A9a1B442ac72fa9e9F");
 
     // Default
     let safe_version = SafeWalletVersion::new(1, 3, 0);
@@ -30,7 +30,7 @@ fn test_signing_hasher() {
         Address::ZERO,
         U256::from(nonce),
     );
-    let domain_hasher = DomainHasher::new(safe_version, chain_id, safe_contract);
+    let domain_hasher = DomainHasher::new(safe_version, chain_id, safe_address);
     let safe_hasher = SafeHasher::new(domain_hasher.hash(), message_hasher.hash());
     let readable_hash = hex::encode(safe_hasher.hash());
     assert_eq!(

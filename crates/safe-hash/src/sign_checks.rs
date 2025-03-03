@@ -16,19 +16,14 @@ pub fn handle_checks_for_signing(
 ) {
     // Calculate hashes
     let domain_hash = {
-        let domain_hasher = DomainHasher::new(
-            safe_verion.clone(),
-            chain_id,
-            args.safe_contract
-                .expect("safe contract not provided for checking the signing transaction"),
-        );
+        let domain_hasher = DomainHasher::new(safe_verion.clone(), chain_id, args.safe_address);
         domain_hasher.hash()
     };
 
     let message_hash = {
         let calldata_hash = {
             let calldata_hasher = CallDataHasher::new(tx_data.data.clone());
-            calldata_hasher.hash().expect(&format!("unable to hash {:?}", tx_data.data))
+            calldata_hasher.hash().unwrap_or_else(|_| panic!("unable to hash {:?}", tx_data.data))
         };
         let message_hasher = TxMessageHasher::new(
             safe_verion,
@@ -41,7 +36,7 @@ pub fn handle_checks_for_signing(
             tx_data.gas_price,
             tx_data.gas_token,
             tx_data.refund_receiver,
-            U256::from(args.nonce.expect("nonce is absent")),
+            U256::from(args.nonce),
         );
         message_hasher.hash()
     };

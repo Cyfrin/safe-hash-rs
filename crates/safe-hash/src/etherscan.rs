@@ -16,7 +16,7 @@ pub fn is_contract_verfied(
     let response = client.get(&url).send()?.json::<serde_json::Value>()?;
 
     let results = response.get("result").ok_or("bad reponse")?.as_array().ok_or("bad response")?;
-    let entry = results.get(0).ok_or("bad response")?;
+    let entry = results.first().ok_or("bad response")?;
 
     let source_code =
         entry.get("SourceCode").ok_or("bad response")?.as_str().ok_or("bad response")?;

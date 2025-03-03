@@ -20,16 +20,13 @@ pub fn warn_suspicious_content(tx_data: &TxInput, chain_id: Option<ChainId>) {
         warnings.push(
             "This combination may be used to hide a redirection of funds through gas refunds.",
         );
-    } else {
-        if tx_data.refund_receiver != Address::ZERO {
-            warnings.push(
-                "Custom refund receiver found for the transaction. Verify that this is intentional",
-            );
-        } else if tx_data.gas_token != Address::ZERO {
-            warnings.push(
-                "Custom gas token found for the transaction. Verify that this is intentional",
-            );
-        }
+    } else if tx_data.refund_receiver != Address::ZERO {
+        warnings.push(
+            "Custom refund receiver found for the transaction. Verify that this is intentional",
+        );
+    } else if tx_data.gas_token != Address::ZERO {
+        warnings
+            .push("Custom gas token found for the transaction. Verify that this is intentional");
     }
 
     if tx_data.gas_price != U256::ZERO {
@@ -44,7 +41,7 @@ pub fn warn_suspicious_content(tx_data: &TxInput, chain_id: Option<ChainId>) {
     // Check `to` address contract verification status
     let f = &format!(
         "Since the tx carries non zero value, check to see {} is a verified contract. Set ETHERSCAN_API_KEY in env and specify the chain for auto check",
-        tx_data.to.to_string()
+        tx_data.to
     );
     if !tx_data.value.is_zero() {
         match chain_id.map(|chain_id| is_contract_verfied(&tx_data.to.to_string(), chain_id)) {
