@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct TenderlyTxInput {
+pub struct TxInput {
     base_gas: Option<U256>,
     data_gas: Option<U256>,
     pub data: String,
@@ -20,7 +20,7 @@ pub struct TenderlyTxInput {
     pub signatures: String,
 }
 
-impl TenderlyTxInput {
+impl TxInput {
     pub fn base_gas(&self) -> U256 {
         if let Some(base_gas) = self.base_gas {
             return base_gas;
@@ -52,7 +52,7 @@ mod tests {
               "signatures": "0x00000000000000000000000012345647579d3685e2f908fc3d3b9df7320149d400000000000000000000000000000000000000000000000000000000000000000152e3037047687bbfc1d4df0b140431dae7b6190040f94017095e060cc8a799c260c88ffd7f82d6f5f63305b729090a580558f57b05671dace5bb3fa149c691c71b"
             }
         "#;
-        let tx: TenderlyTxInput = serde_json::from_str(input).unwrap();
+        let tx: TxInput = serde_json::from_str(input).unwrap();
         assert_eq!(tx.to, address!("0x1f28d065e77c8cb223bbb7c5edb3a432268e5811"));
         assert_eq!(tx.value, U256::from(0));
         assert_eq!(

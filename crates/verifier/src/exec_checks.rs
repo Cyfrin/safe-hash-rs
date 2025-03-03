@@ -1,11 +1,11 @@
-use crate::tx_file::TenderlyTxInput;
+use crate::tx_file::TxInput;
 use alloy::hex;
 use cli_table::{Cell, Style, Table};
 use color_print::{cprintln, cstr};
 use safe_utils::ExecuteTxHasher;
 use sty::{magenta_bright, underline};
 
-pub fn handle_checks_for_executing(tx_data: &TenderlyTxInput) {
+pub fn handle_checks_for_executing(tx_data: &TxInput) {
     let execute_tx_hasher = ExecuteTxHasher::new(
         tx_data.to,
         tx_data.value,

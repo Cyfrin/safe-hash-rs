@@ -13,7 +13,7 @@ use exec_checks::*;
 use message_checks::*;
 use safe_utils::Of;
 use sign_checks::*;
-use tx_file::TenderlyTxInput;
+use tx_file::TxInput;
 use warn::warn_suspicious_content;
 
 fn main() {
@@ -27,7 +27,7 @@ fn main() {
     args.validate_message_hash();
 
     if args.check_for_signing || args.check_for_executing {
-        let tx_data: TenderlyTxInput = {
+        let tx_data: TxInput = {
             let tx_json =
                 std::fs::read_to_string(&args.tx_file.clone().expect("tx_file not available"))
                     .expect("unable to read file");

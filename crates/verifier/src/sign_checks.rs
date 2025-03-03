@@ -1,4 +1,4 @@
-use crate::{cli::CliArgs, tx_file::TenderlyTxInput};
+use crate::{cli::CliArgs, tx_file::TxInput};
 use ::sty::{magenta_bright, underline};
 use alloy::{
     hex,
@@ -9,7 +9,7 @@ use color_print::{cprintln, cstr};
 use safe_utils::{CallDataHasher, DomainHasher, SafeHasher, SafeWalletVersion, TxMessageHasher};
 
 pub fn handle_checks_for_signing(
-    tx_data: &TenderlyTxInput,
+    tx_data: &TxInput,
     args: &CliArgs,
     chain_id: ChainId,
     safe_verion: SafeWalletVersion,

@@ -1,4 +1,4 @@
-use crate::{etherscan::is_contract_verfied, tx_file::TenderlyTxInput};
+use crate::{etherscan::is_contract_verfied, tx_file::TxInput};
 use alloy::{
     hex,
     primitives::{Address, ChainId, U256, keccak256},
@@ -6,7 +6,7 @@ use alloy::{
 use std::env::VarError;
 use sty::{red_bright, underline};
 
-pub fn warn_suspicious_content(tx_data: &TenderlyTxInput, chain_id: Option<ChainId>) {
+pub fn warn_suspicious_content(tx_data: &TxInput, chain_id: Option<ChainId>) {
     let mut warnings = vec![];
 
     // Check for delegate call
