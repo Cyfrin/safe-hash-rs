@@ -1,3 +1,5 @@
+use std::env::VarError;
+
 use alloy::{
     hex,
     primitives::{Address, ChainId, U256, keccak256},
@@ -42,12 +44,26 @@ pub fn warn_suspicious_content(tx_data: &TenderlyTxInput, chain_id: Option<Chain
     }
 
     // Check `to` address contract verification status
-    if let Some(Ok(is_verified)) =
-        chain_id.map(|chain_id| is_contract_verfied(&tx_data.to.to_string(), chain_id))
-    {
-        if !is_verified && !tx_data.data.is_empty() {
-            warnings.push("Transaction data is not empty and the `to` address is not verified.");
-        }
+    let f = &format!(
+        "Since there is calldata present, check to see {} is a verified contract. Set ETHERSCAN_API_KEY for auto check",
+        tx_data.to.to_string()
+    );
+    if !tx_data.data.is_empty() {
+        match chain_id.map(|chain_id| is_contract_verfied(&tx_data.to.to_string(), chain_id)) {
+            Some(Ok(false)) => {
+                warnings
+                    .push("Transaction data is not empty and the `to` address is not verified.");
+            }
+            Some(Err(err)) => {
+                if err.downcast_ref::<VarError>().is_some() {
+                    warnings.push(f);
+                }
+            }
+            None => {
+                warnings.push(f);
+            }
+            _ => {}
+        };
     }
 
     // Print warnings
