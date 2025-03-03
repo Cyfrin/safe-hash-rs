@@ -45,14 +45,15 @@ pub fn warn_suspicious_content(tx_data: &TenderlyTxInput, chain_id: Option<Chain
 
     // Check `to` address contract verification status
     let f = &format!(
-        "Since there is calldata present, check to see {} is a verified contract. Set ETHERSCAN_API_KEY for auto check",
+        "Since the tx carries non zero value, check to see {} is a verified contract. Set ETHERSCAN_API_KEY for auto check",
         tx_data.to.to_string()
     );
-    if !tx_data.data.is_empty() {
+    if !tx_data.value.is_zero() {
         match chain_id.map(|chain_id| is_contract_verfied(&tx_data.to.to_string(), chain_id)) {
             Some(Ok(false)) => {
-                warnings
-                    .push("Transaction data is not empty and the `to` address is not verified.");
+                warnings.push(
+                    "Transaction carries non zero value but the `to` address is not verified.",
+                );
             }
             Some(Err(err)) => {
                 if err.downcast_ref::<VarError>().is_some() {
