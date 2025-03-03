@@ -20,17 +20,19 @@ fn main() {
     let args = CliArgs::parse();
     args.validate_safe_version();
     args.validate_chain();
-    args.validate_checks_asked();
     args.validate_message_hash();
     args.validate_transaction_params();
 
-    if args.check_for_signing || args.check_for_executing {
+    if args.tx_signing || args.tx_executing {
         let tx_data: TxInput = if let Some(tx_file) = &args.tx_file {
-            let tx_json = std::fs::read_to_string(tx_file).expect("unable to read file");
-            serde_json::from_str(&tx_json).expect("poorly formatted tx json")
+            let tx_json = std::fs::read_to_string(tx_file)
+                .expect(&format!("unable to read file: {:?}", tx_file));
+            serde_json::from_str(&tx_json)
+                .expect(&format!("poorly formatted tx json in file: {:?}", tx_file))
         } else {
+            let to = args.to.unwrap();
             TxInput::new(
-                args.to.expect("'to' address is required when tx-file is not provided"),
+                to,
                 args.value,
                 args.data.clone(),
                 args.operation,
@@ -43,23 +45,23 @@ fn main() {
             )
         };
 
-        if args.check_for_signing {
+        if args.tx_signing {
             let chain_id = ChainId::of(&args.chain)
-                .unwrap_or_else(|_| panic!("chain {:?} is supported but id is not found", args.chain));
+                .expect(&format!("chain {:?} is supported but id is not found", args.chain));
 
             handle_checks_for_signing(&tx_data, &args, chain_id, args.safe_version.clone());
             warn_suspicious_content(&tx_data, Some(chain_id));
         }
-        if args.check_for_executing {
+        if args.tx_executing {
             handle_checks_for_executing(&tx_data);
             let chain_id = ChainId::of(&args.chain).ok();
             warn_suspicious_content(&tx_data, chain_id);
         }
     }
 
-    if args.check_for_message_hash {
+    if args.msg_signing {
         let chain_id = ChainId::of(&args.chain)
-            .unwrap_or_else(|_| panic!("chain {:?} is supported but id is not found", args.chain));
+            .expect(&format!("chain {:?} is supported but id is not found", args.chain));
 
         handle_checks_for_message_hash(&args, chain_id, args.safe_version.clone());
     }

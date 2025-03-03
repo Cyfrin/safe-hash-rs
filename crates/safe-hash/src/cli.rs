@@ -73,17 +73,17 @@ pub struct CliArgs {
     #[arg(short, long)]
     pub message_file: Option<PathBuf>,
 
-    /// Check for signing the transaction
-    #[arg(short = 'k', long, group = "check_for")]
-    pub check_for_signing: bool,
+    /// Check transaction signing (default if no mode specified)
+    #[arg(long = "tx-signing", group = "mode", default_value_t = true)]
+    pub tx_signing: bool,
 
-    /// Check for executing the transaction
-    #[arg(short = 'x', long, group = "check_for")]
-    pub check_for_executing: bool,
+    /// Check transaction execution
+    #[arg(long = "tx-executing", group = "mode")]
+    pub tx_executing: bool,
 
-    /// Check message hashes off-chain
-    #[arg(short = 'o', long, group = "check_for")]
-    pub check_for_message_hash: bool,
+    /// Check message signing
+    #[arg(long = "msg-signing", group = "mode")]
+    pub msg_signing: bool,
 }
 
 impl CliArgs {
@@ -91,15 +91,6 @@ impl CliArgs {
         let valid_names = get_all_supported_chain_names();
         if !valid_names.contains(&self.chain) {
             eprintln!("chain {:?} is not supported", self.chain);
-            std::process::exit(1);
-        }
-    }
-
-    pub fn validate_checks_asked(&self) {
-        if !self.check_for_signing && !self.check_for_executing && !self.check_for_message_hash {
-            eprintln!(
-                "please use one of --check-for-signing or --check-for-executing or --check-for-message-hash"
-            );
             std::process::exit(1);
         }
     }
@@ -112,20 +103,15 @@ impl CliArgs {
     }
 
     pub fn validate_message_hash(&self) {
-        if self.check_for_message_hash && self.message_file.is_none() {
-            eprintln!("message file must be specified when checking for message hash");
+        if self.msg_signing && self.message_file.is_none() {
+            eprintln!("message file must be specified when checking for message signing");
             std::process::exit(1);
         }
     }
 
     pub fn validate_transaction_params(&self) {
-        if (self.check_for_signing || self.check_for_executing)
-            && self.tx_file.is_none()
-            && self.to.is_none()
-        {
-            eprintln!(
-                "Either tx-file or 'to' address must be specified when checking for signing or executing"
-            );
+        if (self.tx_signing || self.tx_executing) && self.tx_file.is_none() && self.to.is_none() {
+            eprintln!("Either tx-file or 'to' address must be specified when checking for signing or executing");
             std::process::exit(1);
         }
     }

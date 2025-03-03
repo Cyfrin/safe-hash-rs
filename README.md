@@ -15,36 +15,38 @@ Usage: safe-hash [OPTIONS] --chain <CHAIN> --safe-address <safe_address>
 Options:
   -c, --chain <CHAIN>                  Chain - arbitrum, aurora, avalanche, base, blast, bsc, celo, ethereum, gnosis, linea, mantle, optimism, polygon, scroll, sepolia, worldchain, xlayer, zksync, base-sepolia, gnosis-chiado, polygon-zkevm
   -n, --nonce <NONCE>                  Transaction nonce of the safe address
-  -s, --safe-address <safe_address>  Address of the safe address
-  -t, --tx-file <TX_FILE>              Path to JSON file containing the input from Tenderly's simulation summary
+  -s, --safe-address <safe_address>    Address of the safe address
+  -t, --tx-file <TX_FILE>             Path to JSON file containing the input from Tenderly's simulation summary
   -m, --message-file <MESSAGE_FILE>    Path to message file for offchain message hashes
       --safe-version <SAFE_VERSION>    Safe Contract version [default: 1.3.0]
-      --check-for-signing              Check for signing the transaction
-      --check-for-executing            Check for executing the transaction
-      --check-for-message-hash         Check message hashes off-chain
-  -h, --help                           Print help
-  -V, --version                        Print version
+      --tx-signing                     Check transaction signing (default mode if none specified)
+      --tx-executing                   Check transaction execution
+      --msg-signing                    Check message signing
+  -h, --help                          Print help
+  -V, --version                       Print version
 ```
 
 ## Example 
 
-### Verify before signing transactions
+### Verify before signing transactions (default mode)
 
 ```bash
-./safe-hash -s 0xMultiSigAddress -c arbitrum -n 5 -t tx-file.json --check-for-signing
+# These two commands are equivalent
+./safe-hash -s 0xMultiSigAddress -c arbitrum -n 5 -t tx-file.json
+./safe-hash -s 0xMultiSigAddress -c arbitrum -n 5 -t tx-file.json --tx-signing
 ```
 Before signing the transaction in the ledger, make sure the safe tx hash matches 
 
 ### Verify before executing transactions
 
 ```bash
-./safe-hash -t tx-file.json --check-for-executing
+./safe-hash -t tx-file.json --tx-executing
 ```
 Before signing to execute the transaction in the ledger, make sure the calldata matches 
 
-### Verify off chain signed messages
+### Verify message signing
 ```bash
-./safe-hash -s 0xMultiSigAddress -c arbitrum -m message-file.txt --check-for-message-hash
+./safe-hash -s 0xMultiSigAddress -c arbitrum -m message-file.txt --msg-signing
 ```
 
 ### NOTE
