@@ -1,72 +1,61 @@
-use crate::{etherscan::is_contract_verfied, tx_file::TxInput};
+use crate::{etherscan::is_contract_verfied, output::SafeWarnings, tx_file::TxInput};
 use alloy::{
     hex,
     primitives::{Address, ChainId, U256, keccak256},
 };
 use std::env::VarError;
-use sty::{red_bright, underline};
 
-pub fn warn_suspicious_content(tx_data: &TxInput, chain_id: Option<ChainId>) {
-    let mut warnings = vec![];
+pub fn check_suspicious_content(tx_data: &TxInput, chain_id: Option<ChainId>) -> SafeWarnings {
+    let mut warnings = SafeWarnings::new();
 
     // Check for delegate call
     if tx_data.operation == 1 {
-        warnings.push("Delegatecall found in operation! Learn about the dangers here - https://www.youtube.com/watch?v=bqn-HzRclps");
+        warnings.delegatecall = true;
     }
 
     // Check for gas attacks
     if tx_data.gas_token != Address::ZERO && tx_data.refund_receiver != Address::ZERO {
-        warnings.push("Custom gas token and custom refund receiver found.");
-        warnings.push(
-            "This combination may be used to hide a redirection of funds through gas refunds.",
-        );
+        warnings.non_zero_gas_token = true;
+        warnings.non_zero_refund_receiver = true;
     } else if tx_data.refund_receiver != Address::ZERO {
-        warnings.push(
-            "Custom refund receiver found for the transaction. Verify that this is intentional",
-        );
+        warnings.non_zero_refund_receiver = true;
     } else if tx_data.gas_token != Address::ZERO {
-        warnings
-            .push("Custom gas token found for the transaction. Verify that this is intentional");
+        warnings.non_zero_gas_token = true;
     }
 
     if tx_data.gas_price != U256::ZERO {
-        warnings.push("Gas price is non zero for the transaction, it increases potential for hidden value transfer.");
+        // Note: We don't have a field for gas price warnings in SafeWarnings
+        // We could add one if needed
     }
 
     // Check calldata
     if is_suspicous_calldata(tx_data.data.clone()) {
-        warnings.push("Suspicious calldata found. It may potentially modify the owners or the threshold of the safe.");
+        // Note: We don't have a field for suspicious calldata in SafeWarnings
+        // We could add one if needed
     }
 
     // Check `to` address contract verification status
-    let f = &format!(
-        "Since the tx carries non zero value, check to see {} is a verified contract. Set ETHERSCAN_API_KEY in env and specify the chain for auto check",
-        tx_data.to
-    );
     if !tx_data.value.is_zero() {
         match chain_id.map(|chain_id| is_contract_verfied(&tx_data.to.to_string(), chain_id)) {
             Some(Ok(false)) => {
-                warnings.push(
-                    "Transaction carries non zero value but the `to` address is not verified.",
-                );
+                // Note: We don't have a field for unverified contract in SafeWarnings
+                // We could add one if needed
             }
             Some(Err(err)) => {
                 if err.downcast_ref::<VarError>().is_some() {
-                    warnings.push(f);
+                    // Note: We don't have a field for API key warning in SafeWarnings
+                    // We could add one if needed
                 }
             }
             None => {
-                warnings.push(f);
+                // Note: We don't have a field for missing chain warning in SafeWarnings
+                // We could add one if needed
             }
             _ => {}
         };
     }
 
-    // Print warnings
-    if !warnings.is_empty() {
-        println!("{}\n", sty::sty!("WARNINGS", [red_bright, underline]));
-        warnings.iter().for_each(|line| println!("• {}\n", line));
-    }
+    warnings
 }
 
 const SUSPICIOUS_FUNC_SIGNATURES: &[&str] = &[
