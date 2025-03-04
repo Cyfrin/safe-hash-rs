@@ -1,10 +1,10 @@
-use crate::{cli::CliArgs, output::SafeHashes, tx_file::TxInput};
+use crate::{cli::TransactionArgs, output::SafeHashes, tx_file::TxInput};
 use alloy::primitives::{ChainId, U256};
 use safe_utils::{CallDataHasher, DomainHasher, SafeHasher, SafeWalletVersion, TxMessageHasher};
 
 pub fn handle_checks_for_signing(
     tx_data: &TxInput,
-    args: &CliArgs,
+    args: &TransactionArgs,
     chain_id: ChainId,
     safe_version: SafeWalletVersion,
 ) -> SafeHashes {
@@ -58,8 +58,8 @@ mod tests {
         let nonce = 63;
         let data = "0xa9059cbb00000000000000000000000092d0ebaf7eb707f0650f9471e61348f4656c29bc00000000000000000000000000000000000000000000000000000005d21dba00".to_string();
 
-        let args = CliArgs {
-            chain: "ethereum".to_string(),
+        let args = TransactionArgs {
+            nonce,
             safe_address,
             safe_version: SafeWalletVersion::new(1, 3, 0),
             to: to_address,
@@ -71,7 +71,6 @@ mod tests {
             gas_price: U256::ZERO,
             gas_token: Address::ZERO,
             refund_receiver: Address::ZERO,
-            nonce,
         };
 
         let tx_data = TxInput::new(
@@ -87,7 +86,7 @@ mod tests {
             String::new(),
         );
 
-        let chain_id = ChainId::of(&args.chain).unwrap();
+        let chain_id = ChainId::of("ethereum").unwrap();
         let hashes =
             handle_checks_for_signing(&tx_data, &args, chain_id, args.safe_version.clone());
 
