@@ -131,6 +131,6 @@ Expected output:
 You can find a more detailed list in the [pinned GitHub issue](https://github.com/cyfrin/safe-tx-verifier/issues/1).
 
 ## Trust Assumptions
-* Safe Smart contracts are flawless
-* Tenderly simulation is flawless
-* DNS is not hijacked
+* You trust this codebase
+* You trust your hardware wallet
+* You trust the Safe Wallet contracts
