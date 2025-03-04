@@ -1,5 +1,5 @@
 use alloy::primitives::{Address, U256};
-use clap::{Parser, Subcommand};
+use clap::Parser;
 use safe_utils::{SafeWalletVersion, get_all_supported_chain_names};
 
 #[derive(Parser, Debug)]
@@ -12,72 +12,60 @@ pub struct CliArgs {
     #[arg(short, long, required = true)]
     pub chain: String,
 
-    #[command(subcommand)]
-    pub mode: Mode,
-}
+    /// Transaction signing mode (default)
+    #[arg(long, conflicts_with = "msg")]
+    pub tx: bool,
 
-#[derive(Subcommand, Debug)]
-pub enum Mode {
-    /// Transaction signing mode
-    #[command(name = "tx")]
-    Transaction(TransactionArgs),
-    
     /// Message signing mode
-    #[command(name = "msg")]
-    Message(MessageArgs),
-}
+    #[arg(long, conflicts_with = "tx")]
+    pub msg: bool,
 
-#[derive(Parser, Debug)]
-pub struct TransactionArgs {
-    /// Transaction nonce of the safe address
-    #[arg(short, long, required = true)]
-    pub nonce: u8,
+    /// Transaction nonce of the safe address (required for tx mode)
+    #[arg(short, long, required_if_eq("tx", "true"))]
+    pub nonce: Option<u8>,
 
-    /// Address of the safe address
-    #[arg(short = 's', long = "safe-address", required = true)]
-    pub safe_address: Address,
+    /// Address of the safe address (required for tx mode)
+    #[arg(short = 's', long = "safe-address", required_if_eq("tx", "true"))]
+    pub safe_address: Option<Address>,
 
-    /// Safe Contract version
-    #[arg(short = 'u', long, default_value = "1.3.0")]
-    pub safe_version: SafeWalletVersion,
+    /// Safe Contract version (required for tx mode)
+    #[arg(short = 'u', long, default_value = "1.3.0", required_if_eq("tx", "true"))]
+    pub safe_version: Option<SafeWalletVersion>,
 
-    /// Address of the contract to which the safe-address sends calldata to.
-    #[arg(short, long, required = true)]
-    pub to: Address,
+    /// Address of the contract to which the safe-address sends calldata to (required for tx mode)
+    #[arg(short, long, required_if_eq("tx", "true"))]
+    pub to: Option<Address>,
 
     /// Value asked in the transaction (relates to eth)
-    #[arg(long, default_value_t = U256::ZERO)]
-    pub value: U256,
+    #[arg(long, default_value = "0", required_if_eq("tx", "true"))]
+    pub value: Option<U256>,
 
     /// Raw calldata encoded in hex
-    #[arg(short, long, default_value = "0x")]
-    pub data: String,
+    #[arg(short, long, default_value = "0x", required_if_eq("tx", "true"))]
+    pub data: Option<String>,
 
     /// Call or delegate call (0 or 1)
-    #[arg(long, default_value_t = 0)]
-    pub operation: u8,
+    #[arg(long, default_value = "0", required_if_eq("tx", "true"))]
+    pub operation: Option<u8>,
 
-    #[arg(long, default_value_t = U256::ZERO)]
-    pub safe_tx_gas: U256,
+    #[arg(long, default_value = "0", required_if_eq("tx", "true"))]
+    pub safe_tx_gas: Option<U256>,
 
-    #[arg(long, default_value_t = U256::ZERO)]
-    pub base_gas: U256,
+    #[arg(long, default_value = "0", required_if_eq("tx", "true"))]
+    pub base_gas: Option<U256>,
 
-    #[arg(long, default_value_t = U256::ZERO)]
-    pub gas_price: U256,
+    #[arg(long, default_value = "0", required_if_eq("tx", "true"))]
+    pub gas_price: Option<U256>,
 
-    #[arg(long, default_value_t = Address::ZERO)]
-    pub gas_token: Address,
+    #[arg(long, default_value = "0x0000000000000000000000000000000000000000", required_if_eq("tx", "true"))]
+    pub gas_token: Option<Address>,
 
-    #[arg(long, default_value_t = Address::ZERO)]
-    pub refund_receiver: Address,
-}
+    #[arg(long, default_value = "0x0000000000000000000000000000000000000000", required_if_eq("tx", "true"))]
+    pub refund_receiver: Option<Address>,
 
-#[derive(Parser, Debug)]
-pub struct MessageArgs {
-    /// Path to the message file to be signed
-    #[arg(short, long, required = true)]
-    pub input_file: String,
+    /// Path to the message file to be signed (required for msg mode)
+    #[arg(short, long, required_if_eq("msg", "true"))]
+    pub input_file: Option<String>,
 }
 
 impl CliArgs {
@@ -90,12 +78,18 @@ impl CliArgs {
     }
 
     pub fn validate_safe_version(&self) {
-        if let Mode::Transaction(tx_args) = &self.mode {
-            if tx_args.safe_version < SafeWalletVersion::new(0, 1, 0) {
-                eprintln!("{} version of Safe Wallet is not supported", tx_args.safe_version);
-                std::process::exit(1);
+        if self.tx {
+            if let Some(safe_version) = &self.safe_version {
+                if *safe_version < SafeWalletVersion::new(0, 1, 0) {
+                    eprintln!("{} version of Safe Wallet is not supported", safe_version);
+                    std::process::exit(1);
+                }
             }
         }
+    }
+
+    pub fn is_tx_mode(&self) -> bool {
+        self.tx || (!self.tx && !self.msg) // Default to tx mode if neither flag is set
     }
 }
 
@@ -110,7 +104,6 @@ mod tests {
             "safe-hash".to_string(),
             "--chain".to_string(),
             "ethereum".to_string(),
-            "tx".to_string(),
             "--nonce".to_string(),
             "42".to_string(),
             "--safe-address".to_string(),
@@ -135,15 +128,12 @@ mod tests {
 
         let cli = CliArgs::try_parse_from(&args).unwrap();
         assert_eq!(cli.chain, "ethereum");
-        if let Mode::Transaction(tx_args) = cli.mode {
-            assert_eq!(tx_args.nonce, 42);
-            assert_eq!(tx_args.safe_address, address!("0x1234567890123456789012345678901234567890"));
-            assert_eq!(tx_args.to, address!("0x2234567890123456789012345678901234567890"));
-            assert_eq!(tx_args.value, U256::from(0));
-            assert_eq!(tx_args.data, "0xabcd");
-        } else {
-            panic!("Expected Transaction mode");
-        }
+        assert!(cli.is_tx_mode());
+        assert_eq!(cli.nonce.unwrap(), 42);
+        assert_eq!(cli.safe_address.unwrap(), address!("0x1234567890123456789012345678901234567890"));
+        assert_eq!(cli.to.unwrap(), address!("0x2234567890123456789012345678901234567890"));
+        assert_eq!(cli.value.unwrap(), U256::from(0));
+        assert_eq!(cli.data.unwrap(), "0xabcd");
     }
 
     #[test]
@@ -163,15 +153,12 @@ mod tests {
         ]);
 
         let cli = CliArgs::try_parse_from(&args).unwrap();
-        if let Mode::Transaction(tx_args) = cli.mode {
-            assert_eq!(tx_args.safe_tx_gas, U256::from(100000));
-            assert_eq!(tx_args.base_gas, U256::from(21000));
-            assert_eq!(tx_args.gas_price, U256::from(50000000000u64));
-            assert_eq!(tx_args.gas_token, address!("0x3234567890123456789012345678901234567890"));
-            assert_eq!(tx_args.refund_receiver, address!("0x4234567890123456789012345678901234567890"));
-        } else {
-            panic!("Expected Transaction mode");
-        }
+        assert!(cli.is_tx_mode());
+        assert_eq!(cli.safe_tx_gas.unwrap(), U256::from(100000));
+        assert_eq!(cli.base_gas.unwrap(), U256::from(21000));
+        assert_eq!(cli.gas_price.unwrap(), U256::from(50000000000u64));
+        assert_eq!(cli.gas_token.unwrap(), address!("0x3234567890123456789012345678901234567890"));
+        assert_eq!(cli.refund_receiver.unwrap(), address!("0x4234567890123456789012345678901234567890"));
     }
 
     #[test]
@@ -180,17 +167,26 @@ mod tests {
             "safe-hash".to_string(),
             "--chain".to_string(),
             "ethereum".to_string(),
-            "msg".to_string(),
+            "--msg".to_string(),
             "--input-file".to_string(),
             "message.txt".to_string(),
         ];
 
         let cli = CliArgs::try_parse_from(&args).unwrap();
         assert_eq!(cli.chain, "ethereum");
-        if let Mode::Message(msg_args) = cli.mode {
-            assert_eq!(msg_args.input_file, "message.txt");
-        } else {
-            panic!("Expected Message mode");
-        }
+        assert!(!cli.is_tx_mode());
+        assert_eq!(cli.input_file.unwrap(), "message.txt");
+    }
+
+    #[test]
+    fn test_default_mode() {
+        let args = vec![
+            "safe-hash".to_string(),
+            "--chain".to_string(),
+            "ethereum".to_string(),
+        ];
+
+        let cli = CliArgs::try_parse_from(&args).unwrap();
+        assert!(cli.is_tx_mode());
     }
 }
