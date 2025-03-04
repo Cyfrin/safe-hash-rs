@@ -17,7 +17,7 @@ cargo build --release
 # The binary will be available at target/release/safe-hash
 
 # Option 2: Install globally
-cargo install --path .
+cargo install --path crates/safe-hash
 # The binary will be available as 'safe-hash' in your PATH
 ```
 
