@@ -159,10 +159,7 @@ impl MessageHasher {
             DynSolValue::Tuple(vec![
                 DynSolValue::FixedBytes(keccak256("SafeMessage(bytes message)"), 32),
                 DynSolValue::FixedBytes(
-                    keccak256(
-                        DynSolValue::FixedBytes(hashed_message, 32)
-                            .abi_encode(),
-                    ),
+                    keccak256(DynSolValue::FixedBytes(hashed_message, 32).abi_encode()),
                     32,
                 ),
             ])

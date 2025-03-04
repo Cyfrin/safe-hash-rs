@@ -38,4 +38,3 @@ fn test_signing_hasher() {
         "213be037275c94449a28b4edead76b0d63c7e12b52257f9d5686d98b9a1a5ff4".to_string()
     );
 }
-

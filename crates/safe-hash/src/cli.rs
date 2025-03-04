@@ -14,7 +14,7 @@ pub enum Mode {
     /// Transaction signing mode
     #[command(name = "tx")]
     Transaction(TransactionArgs),
-    
+
     /// Message signing mode
     #[command(name = "msg")]
     Message(MessageArgs),
@@ -111,17 +111,16 @@ impl CliArgs {
             if !valid_names.contains(&tx_args.chain) {
                 eprintln!("chain {:?} is not supported", tx_args.chain);
                 std::process::exit(1);
-            }       
+            }
         } else if let Mode::Message(msg_args) = &self.mode {
             let valid_names = get_all_supported_chain_names();
             if !valid_names.contains(&msg_args.chain) {
                 eprintln!("chain {:?} is not supported", msg_args.chain);
                 std::process::exit(1);
-            }       
+            }
         }
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -161,7 +160,10 @@ mod tests {
         if let Mode::Transaction(tx_args) = cli.mode {
             assert_eq!(tx_args.chain, "ethereum");
             assert_eq!(tx_args.nonce, 42);
-            assert_eq!(tx_args.safe_address, address!("0x1234567890123456789012345678901234567890"));
+            assert_eq!(
+                tx_args.safe_address,
+                address!("0x1234567890123456789012345678901234567890")
+            );
             assert_eq!(tx_args.to, address!("0x2234567890123456789012345678901234567890"));
             assert_eq!(tx_args.value, U256::from(0));
             assert_eq!(tx_args.data, "0xabcd");
@@ -192,7 +194,10 @@ mod tests {
             assert_eq!(tx_args.base_gas, U256::from(21000));
             assert_eq!(tx_args.gas_price, U256::from(50000000000u64));
             assert_eq!(tx_args.gas_token, address!("0x3234567890123456789012345678901234567890"));
-            assert_eq!(tx_args.refund_receiver, address!("0x4234567890123456789012345678901234567890"));
+            assert_eq!(
+                tx_args.refund_receiver,
+                address!("0x4234567890123456789012345678901234567890")
+            );
         } else {
             panic!("Expected Transaction mode");
         }
@@ -215,7 +220,10 @@ mod tests {
         if let Mode::Message(msg_args) = cli.mode {
             assert_eq!(msg_args.chain, "ethereum");
             assert_eq!(msg_args.input_file, "message.txt");
-            assert_eq!(msg_args.safe_address, address!("0x1234567890123456789012345678901234567890"));
+            assert_eq!(
+                msg_args.safe_address,
+                address!("0x1234567890123456789012345678901234567890")
+            );
         } else {
             panic!("Expected Message mode");
         }

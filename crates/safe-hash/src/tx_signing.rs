@@ -57,7 +57,6 @@ impl TxInput {
     }
 }
 
-
 pub fn tx_signing_hashes(
     tx_data: &TxInput,
     args: &TransactionArgs,
@@ -102,7 +101,7 @@ pub fn tx_signing_hashes(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloy::primitives::{address, Address, ChainId, FixedBytes, U256, hex};
+    use alloy::primitives::{Address, ChainId, FixedBytes, U256, address, hex};
     use safe_utils::{Of, SafeWalletVersion};
     use std::str::FromStr;
 
@@ -144,8 +143,7 @@ mod tests {
         );
 
         let chain_id = ChainId::of("ethereum").unwrap();
-        let hashes =
-            tx_signing_hashes(&tx_data, &args, chain_id, args.safe_version.clone());
+        let hashes = tx_signing_hashes(&tx_data, &args, chain_id, args.safe_version.clone());
 
         // Expected outputs
         let expected_domain = FixedBytes::new(
@@ -172,7 +170,7 @@ mod tests {
         assert_eq!(hashes.message_hash, expected_message, "Message hash mismatch");
         assert_eq!(hashes.safe_tx_hash, expected_safe, "Safe transaction hash mismatch");
     }
-    
+
     #[test]
     fn test_sample_tx_file_is_deserializable() {
         let input = r#"

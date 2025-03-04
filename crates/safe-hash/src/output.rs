@@ -42,18 +42,20 @@ impl SafeWarnings {
 
 pub fn display_hashes(hashes: &SafeHashes) {
     let mut table_rows = Vec::new();
-    
+
     // Add raw message hash if available
     if let Some(raw_hash) = hashes.raw_message_hash {
-        table_rows.push(vec![
-            cstr!("<green>Raw Message Hash</>").cell(),
-            hex::encode(raw_hash).cell(),
-        ]);
+        table_rows
+            .push(vec![cstr!("<green>Raw Message Hash</>").cell(), hex::encode(raw_hash).cell()]);
     }
-    
+
     // Add the standard hashes
-    table_rows.push(vec![cstr!("<green>Domain Hash</>").cell(), hex::encode(hashes.domain_hash).cell()]);
-    table_rows.push(vec![cstr!("<green>Message Hash</>").cell(), hex::encode(hashes.message_hash).cell()]);
+    table_rows
+        .push(vec![cstr!("<green>Domain Hash</>").cell(), hex::encode(hashes.domain_hash).cell()]);
+    table_rows.push(vec![
+        cstr!("<green>Message Hash</>").cell(),
+        hex::encode(hashes.message_hash).cell(),
+    ]);
     table_rows.push(vec![
         cstr!("<green>Safe Transaction Hash</>").cell(),
         hex::encode(hashes.safe_tx_hash).cell(),

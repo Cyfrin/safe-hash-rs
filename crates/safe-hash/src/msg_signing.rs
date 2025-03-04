@@ -1,5 +1,5 @@
 use crate::{cli::MessageArgs, output::SafeHashes};
-use alloy::primitives::{hex, Address, ChainId};
+use alloy::primitives::ChainId;
 use safe_utils::{DomainHasher, MessageHasher, SafeHasher, SafeWalletVersion};
 
 pub struct MsgInput {
@@ -46,10 +46,9 @@ pub fn msg_signing_hashes(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloy::primitives::{address, Address, ChainId, FixedBytes, hex};
+    use alloy::primitives::{Address, ChainId, FixedBytes, hex};
     use safe_utils::{Of, SafeWalletVersion};
-    use std::str::FromStr;
-    use std::fs;
+    use std::{fs, str::FromStr};
     #[test]
     fn test_msg_signing_hashes() {
         // Create test inputs
@@ -59,15 +58,15 @@ mod tests {
             chain: "sepolia".to_string(),
             input_file: "../../test/test_message.txt".to_string(),
             safe_address,
-            safe_version: SafeWalletVersion::new(1, 3, 0)
+            safe_version: SafeWalletVersion::new(1, 3, 0),
         };
 
-
-       let message = fs::read_to_string(&args.input_file)
-                .unwrap_or_else(|_| panic!("Failed to read message file: {}", args.input_file));
+        let message = fs::read_to_string(&args.input_file)
+            .unwrap_or_else(|_| panic!("Failed to read message file: {}", args.input_file));
         let msg_data = MsgInput::new(message);
         let chain_id = ChainId::of("sepolia").unwrap();
-        let hashes = msg_signing_hashes(&msg_data, &args, chain_id, SafeWalletVersion::new(1, 3, 0));
+        let hashes =
+            msg_signing_hashes(&msg_data, &args, chain_id, SafeWalletVersion::new(1, 3, 0));
 
         // Note: These expected values are placeholders and need to be replaced with actual values
         // from a known good test case
