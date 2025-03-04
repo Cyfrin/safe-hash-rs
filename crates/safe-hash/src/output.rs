@@ -3,6 +3,7 @@ use cli_table::{Cell, Style, Table};
 use color_print::{cprintln, cstr};
 
 pub struct SafeHashes {
+    pub raw_message_hash: Option<FixedBytes<32>>,
     pub domain_hash: FixedBytes<32>,
     pub message_hash: FixedBytes<32>,
     pub safe_tx_hash: FixedBytes<32>,
@@ -40,20 +41,33 @@ impl SafeWarnings {
 }
 
 pub fn display_hashes(hashes: &SafeHashes) {
-    let table = vec![
-        vec![cstr!("<green>Domain Hash</>").cell(), hex::encode(hashes.domain_hash).cell()],
-        vec![cstr!("<green>Message Hash</>").cell(), hex::encode(hashes.message_hash).cell()],
-        vec![
-            cstr!("<green>Safe Transaction Hash</>").cell(),
-            hex::encode(hashes.safe_tx_hash).cell(),
-        ],
-    ]
-    .table()
-    .title(vec![
-        cstr!("<cyan>TYPE</>").cell().bold(true),
-        cstr!("<cyan>CALCULATED HASHES</cyan>").cell().bold(true),
-    ])
-    .bold(true);
+    let mut table_rows = Vec::new();
+
+    // Add raw message hash if available
+    if let Some(raw_hash) = hashes.raw_message_hash {
+        table_rows
+            .push(vec![cstr!("<green>Raw Message Hash</>").cell(), hex::encode(raw_hash).cell()]);
+    }
+
+    // Add the standard hashes
+    table_rows
+        .push(vec![cstr!("<green>Domain Hash</>").cell(), hex::encode(hashes.domain_hash).cell()]);
+    table_rows.push(vec![
+        cstr!("<green>Message Hash</>").cell(),
+        hex::encode(hashes.message_hash).cell(),
+    ]);
+    table_rows.push(vec![
+        cstr!("<green>Safe Transaction Hash</>").cell(),
+        hex::encode(hashes.safe_tx_hash).cell(),
+    ]);
+
+    let table = table_rows
+        .table()
+        .title(vec![
+            cstr!("<cyan>TYPE</>").cell().bold(true),
+            cstr!("<cyan>CALCULATED HASHES</cyan>").cell().bold(true),
+        ])
+        .bold(true);
 
     let table_display = table.display().unwrap();
     println!("{}", table_display);
