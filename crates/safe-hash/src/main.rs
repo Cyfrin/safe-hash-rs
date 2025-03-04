@@ -1,7 +1,7 @@
 mod cli;
 mod etherscan;
 mod output;
-mod sign_checks;
+mod tx_signing;
 mod tx_file;
 mod warn;
 
@@ -10,7 +10,7 @@ use clap::Parser;
 use cli::{CliArgs, Mode};
 use output::{display_hashes, display_warnings};
 use safe_utils::{Of, SafeWalletVersion};
-use sign_checks::*;
+use tx_signing::*;
 use tx_file::TxInput;
 use warn::check_suspicious_content;
 use std::fs;

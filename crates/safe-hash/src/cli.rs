@@ -124,9 +124,9 @@ mod tests {
     fn base_args() -> Vec<String> {
         vec![
             "safe-hash".to_string(),
+            "tx".to_string(),
             "--chain".to_string(),
             "ethereum".to_string(),
-            "tx".to_string(),
             "--nonce".to_string(),
             "42".to_string(),
             "--safe-address".to_string(),
@@ -194,9 +194,9 @@ mod tests {
     fn test_message_mode() {
         let args = vec![
             "safe-hash".to_string(),
+            "msg".to_string(),
             "--chain".to_string(),
             "ethereum".to_string(),
-            "msg".to_string(),
             "--input-file".to_string(),
             "message.txt".to_string(),
         ];
