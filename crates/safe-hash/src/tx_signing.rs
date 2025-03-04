@@ -91,12 +91,12 @@ pub fn tx_signing_hashes(
         message_hasher.hash()
     };
 
-    let safe_hash = {
+    let safe_tx_hash = {
         let safe_hasher = SafeHasher::new(domain_hash, message_hash);
         safe_hasher.hash()
     };
 
-    SafeHashes { domain_hash, message_hash, safe_tx_hash: safe_hash }
+    SafeHashes { domain_hash, message_hash, safe_tx_hash, raw_message_hash: None }
 }
 
 #[cfg(test)]

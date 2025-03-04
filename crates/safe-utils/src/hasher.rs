@@ -35,20 +35,6 @@ pub struct SafeHasher {
     message_hash: B256,
 }
 
-#[derive(Debug)]
-pub struct ExecuteTxHasher {
-    to: Address,
-    value: U256,
-    data: String,
-    operation: u8,
-    safe_tx_gas: U256,
-    base_gas: U256,
-    gas_price: U256,
-    gas_token: Address,
-    refund_receiver: Address,
-    signatures: String,
-}
-
 pub struct MessageHasher {
     message: String,
 }
@@ -158,74 +144,23 @@ impl SafeHasher {
     }
 }
 
-impl ExecuteTxHasher {
-    pub fn new(
-        to: Address,
-        value: U256,
-        data: String,
-        operation: u8,
-        safe_tx_gas: U256,
-        base_gas: U256,
-        gas_price: U256,
-        gas_token: Address,
-        refund_receiver: Address,
-        signatures: String,
-    ) -> Self {
-        Self {
-            to,
-            value,
-            data,
-            operation,
-            safe_tx_gas,
-            base_gas,
-            gas_price,
-            gas_token,
-            refund_receiver,
-            signatures,
-        }
-    }
-
-    pub fn calldata(&self) -> Vec<u8> {
-        let function_selector = &keccak256(
-            "execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)",
-        )[..4];
-
-        let data_bytes = hex::decode(self.data.clone()).expect("corrupted calldata");
-        let signature_bytes = hex::decode(self.signatures.clone()).expect("corrupted signature");
-
-        let encoded_arguments = DynSolValue::Tuple(vec![
-            DynSolValue::Address(self.to),
-            DynSolValue::Uint(self.value, 256),
-            DynSolValue::Bytes(data_bytes),
-            DynSolValue::Uint(U256::from(self.operation), 8),
-            DynSolValue::Uint(U256::from(self.safe_tx_gas), 256),
-            DynSolValue::Uint(U256::from(self.base_gas), 256),
-            DynSolValue::Uint(U256::from(self.gas_price), 256),
-            DynSolValue::Address(self.gas_token),
-            DynSolValue::Address(self.refund_receiver),
-            DynSolValue::Bytes(signature_bytes),
-        ])
-        .abi_encode_params();
-
-        [function_selector, &encoded_arguments[..]].concat()
-    }
-
-    pub fn calldata_hash(&self) -> B256 {
-        keccak256(self.calldata())
-    }
-}
-
 impl MessageHasher {
     pub fn new(message: String) -> Self {
         Self { message }
     }
+
+    pub fn raw_hash(&self) -> B256 {
+        eip191_hash_message(self.message.clone())
+    }
+
     pub fn hash(&self) -> B256 {
+        let hashed_message = self.raw_hash();
         keccak256(
             DynSolValue::Tuple(vec![
                 DynSolValue::FixedBytes(keccak256("SafeMessage(bytes message)"), 32),
                 DynSolValue::FixedBytes(
                     keccak256(
-                        DynSolValue::FixedBytes(eip191_hash_message(self.message.clone()), 32)
+                        DynSolValue::FixedBytes(hashed_message, 32)
                             .abi_encode(),
                     ),
                     32,

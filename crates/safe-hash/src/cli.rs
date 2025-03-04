@@ -82,6 +82,14 @@ pub struct MessageArgs {
     #[arg(short, long, required = true)]
     pub chain: String,
 
+    /// Address of the safe address
+    #[arg(short = 's', long = "safe-address", required = true)]
+    pub safe_address: Address,
+
+    /// Safe Contract version
+    #[arg(short = 'u', long, default_value = "1.3.0")]
+    pub safe_version: SafeWalletVersion,
+
     /// Path to the message file to be signed
     #[arg(short, long, required = true)]
     pub input_file: String,
@@ -197,6 +205,8 @@ mod tests {
             "msg".to_string(),
             "--chain".to_string(),
             "ethereum".to_string(),
+            "--safe-address".to_string(),
+            "0x1234567890123456789012345678901234567890".to_string(),
             "--input-file".to_string(),
             "message.txt".to_string(),
         ];
@@ -205,6 +215,7 @@ mod tests {
         if let Mode::Message(msg_args) = cli.mode {
             assert_eq!(msg_args.chain, "ethereum");
             assert_eq!(msg_args.input_file, "message.txt");
+            assert_eq!(msg_args.safe_address, address!("0x1234567890123456789012345678901234567890"));
         } else {
             panic!("Expected Message mode");
         }

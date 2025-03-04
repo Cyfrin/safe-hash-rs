@@ -2,6 +2,7 @@ mod cli;
 mod etherscan;
 mod output;
 mod tx_signing;
+mod msg_signing;
 mod warn;
 
 use alloy::primitives::ChainId;
@@ -10,6 +11,7 @@ use cli::{CliArgs, Mode};
 use output::{display_hashes, display_warnings};
 use safe_utils::{Of, SafeWalletVersion};
 use tx_signing::*;
+use msg_signing::*;
 use warn::check_suspicious_content;
 use std::fs;
 
@@ -19,7 +21,6 @@ fn main() {
     args.validate_chain();
 
     match args.mode {
-        
         Mode::Transaction(tx_args) => {
             let chain_id = ChainId::of(&tx_args.chain)
                 .unwrap_or_else(|_| panic!("chain {:?} is supported but id is not found", tx_args.chain));
@@ -46,14 +47,12 @@ fn main() {
         Mode::Message(msg_args) => {
             let chain_id = ChainId::of(&msg_args.chain)
                 .unwrap_or_else(|_| panic!("chain {:?} is supported but id is not found", msg_args.chain));
+            
             let message = fs::read_to_string(&msg_args.input_file)
                 .unwrap_or_else(|_| panic!("Failed to read message file: {}", msg_args.input_file));
-            
-            // TODO: Implement message signing logic here
-            // This will require implementing a new function in sign_checks.rs
-            // to handle message signing with the appropriate Safe message format
-            println!("Message signing mode not yet implemented");
-            println!("Message content: {}", message);
+            let msg_data = MsgInput::new(message);
+            let hashes = msg_signing_hashes(&msg_data, &msg_args, chain_id, SafeWalletVersion::new(1, 3, 0));
+            display_hashes(&hashes);
         }
     }
 }
@@ -64,7 +63,7 @@ mod tests {
     use std::process::Command;
 
     #[test]
-    fn test_safe_hash_cli_output() {
+    fn test_safe_hash_tx_signing_cli_output() {
         // Run the safe-hash command with some test arguments
         let output = Command::new("cargo")
             .arg("run")
@@ -96,5 +95,36 @@ mod tests {
         assert!(stdout.contains("f22754eba5a2b230714534b4657195268f00dc0031296de4b835d82e7aa1e574"));
         // Safe transaction hash
         assert!(stdout.contains("ad06b099fca34e51e4886643d95d9a19ace2cd024065efb66662a876e8c40343"));
+    }
+
+    #[test]
+    fn test_safe_hash_msg_signing_cli_output() {
+        // Run the safe-hash command with some test arguments
+        let output = Command::new("cargo")
+            .arg("run")
+            .arg("--")
+            .arg("msg")
+            .arg("--chain")
+            .arg("sepolia")
+            .arg("--safe-address")
+            .arg("0x657ff0D4eC65D82b2bC1247b0a558bcd2f80A0f1")
+            .arg("--input-file")
+            .arg("../../test/test_message.txt")
+            .output()
+            .expect("Failed to execute command");
+
+        // Assert that the command executed successfully
+        assert!(output.status.success(), "Command failed: {}", String::from_utf8_lossy(&output.stderr));
+        
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        println!("{}", stdout);
+
+        // Check for essential content without formatting
+        // Domain hash
+        assert!(stdout.contains("611379c19940caee095cdb12bebe6a9fa9abb74cdb1fbd7377c49a1f198dc24f"));
+        // Message hash
+        assert!(stdout.contains("a5d2f507a16279357446768db4bd47a03bca0b6acac4632a4c2c96af20d6f6e5"));
+        // Safe transaction hash
+        assert!(stdout.contains("1866b559f56261ada63528391b93a1fe8e2e33baf7cace94fc6b42202d16ea08"));
     }
 }
