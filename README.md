@@ -5,6 +5,8 @@
 
 ## Installation From Source
 
+**Prerequisite: [Rust](https://www.rust-lang.org/tools/install)**
+
 ```bash
 # Clone the repository
 git clone https://github.com/cyfrin/safe-hash-rs.git
