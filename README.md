@@ -74,16 +74,16 @@ Options:
 
 ```bash
 # Basic transaction with just a target address and value
-./safe-hash tx -s 0xSafeAddress -c ethereum -n 42 -t 0xTargetContract --value 1000000000000000000
+safe-hash tx -s 0xSafeAddress -c ethereum -n 42 -t 0xTargetContract --value 1000000000000000000
 
 # Transaction with calldata (e.g., token transfer)
-./safe-hash tx -s 0xSafeAddress -c ethereum -n 42 -t 0xTokenContract -d 0xdatadatadata
+safe-hash tx -s 0xSafeAddress -c ethereum -n 42 -t 0xTokenContract -d 0xdatadatadata
 
 # Transaction with custom gas parameters
-./safe-hash tx -s 0xSafeAddress -c ethereum -n 42 -t 0xTargetContract --safe-tx-gas 100000 --base-gas 21000 --gas-price 50000000000
+safe-hash tx -s 0xSafeAddress -c ethereum -n 42 -t 0xTargetContract --safe-tx-gas 100000 --base-gas 21000 --gas-price 50000000000
 
-# Real-world example (USDC transfer)
-./safe-hash tx \
+# Real-world example
+safe-hash tx \
   --chain ethereum \
   --nonce 63 \
   --safe-address 0x1c694Fc3006D81ff4a56F97E1b99529066a23725 \
@@ -106,7 +106,7 @@ Expected output:
 
 ```bash
 # Sign a message from a file
-./safe-hash msg \
+safe-hash msg \
   --chain sepolia \
   --safe-address 0x657ff0D4eC65D82b2bC1247b0a558bcd2f80A0f1 \
   --input-file test/test_message.txt
