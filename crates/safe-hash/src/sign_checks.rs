@@ -1,16 +1,16 @@
-use crate::{cli::CliArgs, output::SafeHashes, tx_file::TxInput};
+use crate::{cli::TransactionArgs, output::SafeHashes, tx_file::TxInput};
 use alloy::primitives::{ChainId, U256};
 use safe_utils::{CallDataHasher, DomainHasher, SafeHasher, SafeWalletVersion, TxMessageHasher};
 
 pub fn handle_checks_for_signing(
     tx_data: &TxInput,
-    args: &CliArgs,
+    args: &TransactionArgs,
     chain_id: ChainId,
     safe_version: SafeWalletVersion,
 ) -> SafeHashes {
     // Calculate hashes
     let domain_hash = {
-        let domain_hasher = DomainHasher::new(safe_version.clone(), chain_id, args.safe_address.unwrap());
+        let domain_hasher = DomainHasher::new(safe_version.clone(), chain_id, args.safe_address);
         domain_hasher.hash()
     };
 
@@ -30,7 +30,7 @@ pub fn handle_checks_for_signing(
             tx_data.gas_price,
             tx_data.gas_token,
             tx_data.refund_receiver,
-            U256::from(args.nonce.unwrap()),
+            U256::from(args.nonce),
         );
         message_hasher.hash()
     };
@@ -58,23 +58,20 @@ mod tests {
         let nonce = 63;
         let data = "0xa9059cbb00000000000000000000000092d0ebaf7eb707f0650f9471e61348f4656c29bc00000000000000000000000000000000000000000000000000000005d21dba00".to_string();
 
-        let args = CliArgs {
+        let args = TransactionArgs {
             chain: "ethereum".to_string(),
-            tx: true,
-            msg: false,
-            nonce: Some(nonce),
-            safe_address: Some(safe_address),
-            safe_version: Some(SafeWalletVersion::new(1, 3, 0)),
-            to: Some(to_address),
-            value: Some(U256::ZERO),
-            data: Some(data.clone()),
-            operation: Some(0),
-            safe_tx_gas: Some(U256::ZERO),
-            base_gas: Some(U256::ZERO),
-            gas_price: Some(U256::ZERO),
-            gas_token: Some(Address::ZERO),
-            refund_receiver: Some(Address::ZERO),
-            input_file: None,
+            nonce,
+            safe_address,
+            safe_version: SafeWalletVersion::new(1, 3, 0),
+            to: to_address,
+            value: U256::ZERO,
+            data: data.clone(),
+            operation: 0,
+            safe_tx_gas: U256::ZERO,
+            base_gas: U256::ZERO,
+            gas_price: U256::ZERO,
+            gas_token: Address::ZERO,
+            refund_receiver: Address::ZERO,
         };
 
         let tx_data = TxInput::new(
@@ -92,7 +89,7 @@ mod tests {
 
         let chain_id = ChainId::of("ethereum").unwrap();
         let hashes =
-            handle_checks_for_signing(&tx_data, &args, chain_id, args.safe_version.as_ref().unwrap().clone());
+            handle_checks_for_signing(&tx_data, &args, chain_id, args.safe_version.clone());
 
         // Expected outputs
         let expected_domain = FixedBytes::new(
