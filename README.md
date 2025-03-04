@@ -3,7 +3,7 @@
 > [!CAUTION]
 > It is under development and is not fully tested. Please do not use it in production environments.
 
-## Installation
+## Installation From Source
 
 ```bash
 # Clone the repository
