@@ -2,7 +2,6 @@ mod cli;
 mod etherscan;
 mod output;
 mod tx_signing;
-mod tx_file;
 mod warn;
 
 use alloy::primitives::ChainId;
@@ -11,7 +10,6 @@ use cli::{CliArgs, Mode};
 use output::{display_hashes, display_warnings};
 use safe_utils::{Of, SafeWalletVersion};
 use tx_signing::*;
-use tx_file::TxInput;
 use warn::check_suspicious_content;
 use std::fs;
 
@@ -39,7 +37,7 @@ fn main() {
                 String::new(), // No signatures needed for signing
             );
 
-            let hashes = handle_checks_for_signing(&tx_data, &tx_args, chain_id, tx_args.safe_version.clone());
+            let hashes = tx_signing_hashes(&tx_data, &tx_args, chain_id, tx_args.safe_version.clone());
             display_hashes(&hashes);
 
             let warnings = check_suspicious_content(&tx_data, Some(chain_id));
