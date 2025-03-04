@@ -3,6 +3,7 @@ name = "safe-hash"
 version = "0.1.0"
 edition = "2024"
 default-run = "safe-hash"
+repository = "https://github.com/cyfrin/safe-hash-rs"
 
 [[bin]]
 name = "safe-hash"
