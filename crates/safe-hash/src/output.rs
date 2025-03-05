@@ -56,8 +56,6 @@ impl SafeWarnings {
         self.delegatecall |= other.delegatecall;
         self.non_zero_gas_token |= other.non_zero_gas_token;
         self.non_zero_refund_receiver |= other.non_zero_refund_receiver;
-
-        // Merge vectors using extend
         self.argument_mismatches.extend(other.argument_mismatches);
     }
 }
