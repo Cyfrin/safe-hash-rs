@@ -73,7 +73,7 @@ fn main() {
                 // Use user-provided data for transaction
                 TxInput::new(
                     tx_args.to.unwrap_or_else(|| {
-                        panic!("'to' address is required in offline mode")
+                        panic!("'--to' address is required in offline mode. When API data cannot be fetched, you must provide the destination address manually.")
                     }),
                     tx_args.value,
                     tx_args.data.clone(),
