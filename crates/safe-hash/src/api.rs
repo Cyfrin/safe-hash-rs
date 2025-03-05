@@ -3,51 +3,35 @@ use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, str::FromStr};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct SafeTransaction {
     pub safe: Address,
     pub to: Address,
     pub value: String,
     pub data: String,
-    #[serde(rename = "dataDecoded")]
     pub data_decoded: Option<DataDecoded>,
     pub operation: u8,
-    #[serde(rename = "gasToken")]
     pub gas_token: Address,
-    #[serde(rename = "safeTxGas")]
     pub safe_tx_gas: u64,
-    #[serde(rename = "baseGas")]
     pub base_gas: u64,
-    #[serde(rename = "gasPrice")]
     pub gas_price: String,
-    #[serde(rename = "refundReceiver")]
     pub refund_receiver: Address,
     pub nonce: u64,
-    #[serde(rename = "safeTxHash")]
     pub safe_tx_hash: String,
-    #[serde(rename = "confirmationsRequired")]
     pub confirmations_required: u64,
     pub confirmations: Vec<Confirmation>,
     pub signatures: String,
     pub proposer: Option<Address>,
-    #[serde(rename = "proposedByDelegate")]
     pub proposed_by_delegate: Option<Address>,
-    #[serde(rename = "executionDate")]
     pub execution_date: Option<String>,
-    #[serde(rename = "submissionDate")]
     pub submission_date: String,
     pub modified: String,
-    #[serde(rename = "blockNumber")]
     pub block_number: u64,
-    #[serde(rename = "transactionHash")]
     pub transaction_hash: Option<String>,
     pub executor: Option<Address>,
-    #[serde(rename = "isExecuted")]
     pub is_executed: bool,
-    #[serde(rename = "isSuccessful")]
     pub is_successful: bool,
-    #[serde(rename = "ethGasPrice")]
     pub eth_gas_price: String,
-    #[serde(rename = "gasUsed")]
     pub gas_used: u64,
     pub fee: String,
     pub origin: String,
@@ -61,23 +45,20 @@ pub struct DataDecoded {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Parameter {
     pub name: String,
-    #[serde(rename = "type")]
     pub r#type: String,
     pub value: String,
-    #[serde(rename = "valueDecoded")]
     pub value_decoded: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Confirmation {
     pub owner: Address,
-    #[serde(rename = "submissionDate")]
     pub submission_date: String,
-    #[serde(rename = "transactionHash")]
     pub transaction_hash: Option<String>,
-    #[serde(rename = "signatureType")]
     pub signature_type: String,
     pub signature: String,
 }
