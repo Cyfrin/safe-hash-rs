@@ -1,8 +1,5 @@
 use crate::{etherscan::is_contract_verfied, output::SafeWarnings, tx_signing::TxInput};
-use alloy::{
-    hex,
-    primitives::{Address, ChainId, U256, keccak256},
-};
+use alloy::primitives::{Address, ChainId, U256};
 use std::env::VarError;
 
 pub fn check_suspicious_content(tx_data: &TxInput, chain_id: Option<ChainId>) -> SafeWarnings {

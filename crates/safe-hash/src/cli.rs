@@ -1,4 +1,4 @@
-use alloy::primitives::{Address, ChainId, U256};
+use alloy::primitives::{Address, U256};
 use clap::{Parser, Subcommand};
 use safe_utils::{SafeWalletVersion, get_all_supported_chain_names};
 use semver::Version;

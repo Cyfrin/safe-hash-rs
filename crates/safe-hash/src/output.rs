@@ -217,7 +217,7 @@ pub fn display_warnings(warnings: &SafeWarnings) {
                     .table()
                     .title(vec![
                         cstr!("").cell().bold(true),
-                        format!("{}", mismatch.field).cell().bold(true),
+                        mismatch.field.to_string().cell().bold(true),
                     ])
                     .bold(true);
                 println!("{}", mismatch_table.display().unwrap());

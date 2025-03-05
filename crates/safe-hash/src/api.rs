@@ -1,12 +1,9 @@
 use crate::{
     cli::TransactionArgs,
     output::Mismatch,
-    tx_signing::{TxInput, tx_signing_hashes},
 };
-use alloy::primitives::{Address, ChainId, FixedBytes, U256, hex};
-use safe_utils::SafeWalletVersion;
+use alloy::primitives::{Address, FixedBytes, U256, hex};
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, str::FromStr};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -141,14 +138,12 @@ pub fn validate_transaction_details(
         }
     }
 
-    if user_args.data != "0x" {
-        if user_args.data != api_tx.data {
-            errors.push(Mismatch {
-                field: "data".to_string(),
-                api_value: api_tx.data.clone(),
-                user_value: user_args.data.clone(),
-            });
-        }
+    if user_args.data != "0x" && user_args.data != api_tx.data {
+        errors.push(Mismatch {
+            field: "data".to_string(),
+            api_value: api_tx.data.clone(),
+            user_value: user_args.data.clone(),
+        });
     }
 
     if user_args.operation != api_tx.operation {
@@ -159,55 +154,44 @@ pub fn validate_transaction_details(
         });
     }
 
-    if user_args.gas_token != Address::ZERO {
-        if user_args.gas_token != api_tx.gas_token {
-            errors.push(Mismatch {
-                field: "gas_token".to_string(),
-                api_value: api_tx.gas_token.to_string(),
-                user_value: user_args.gas_token.to_string(),
-            });
-        }
+    if user_args.gas_token != Address::ZERO && user_args.gas_token != api_tx.gas_token {
+        errors.push(Mismatch {
+            field: "gas_token".to_string(),
+            api_value: api_tx.gas_token.to_string(),
+            user_value: user_args.gas_token.to_string(),
+        });
     }
 
-    if user_args.refund_receiver != Address::ZERO {
-        if user_args.refund_receiver != api_tx.refund_receiver {
-            errors.push(Mismatch {
-                field: "refund_receiver".to_string(),
-                api_value: api_tx.refund_receiver.to_string(),
-                user_value: user_args.refund_receiver.to_string(),
-            });
-        }
+    if user_args.refund_receiver != Address::ZERO && user_args.refund_receiver != api_tx.refund_receiver {
+        errors.push(Mismatch {
+            field: "refund_receiver".to_string(),
+            api_value: api_tx.refund_receiver.to_string(),
+            user_value: user_args.refund_receiver.to_string(),
+        });
     }
 
-    if user_args.safe_tx_gas != U256::ZERO {
-        if user_args.safe_tx_gas != U256::from(api_tx.safe_tx_gas) {
-            errors.push(Mismatch {
-                field: "safe_tx_gas".to_string(),
-                api_value: api_tx.safe_tx_gas.to_string(),
-                user_value: user_args.safe_tx_gas.to_string(),
-            });
-        }
+    if user_args.safe_tx_gas != U256::ZERO && user_args.safe_tx_gas != U256::from(api_tx.safe_tx_gas) {
+        errors.push(Mismatch {
+            field: "safe_tx_gas".to_string(),
+            api_value: api_tx.safe_tx_gas.to_string(),
+            user_value: user_args.safe_tx_gas.to_string(),
+        });
     }
 
-    if user_args.base_gas != U256::ZERO {
-        if user_args.base_gas != U256::from(api_tx.base_gas) {
-            errors.push(Mismatch {
-                field: "base_gas".to_string(),
-                api_value: api_tx.base_gas.to_string(),
-                user_value: user_args.base_gas.to_string(),
-            });
-        }
+    if user_args.base_gas != U256::ZERO && user_args.base_gas != U256::from(api_tx.base_gas) {
+        errors.push(Mismatch {
+            field: "base_gas".to_string(),
+            api_value: api_tx.base_gas.to_string(),
+            user_value: user_args.base_gas.to_string(),
+        });
     }
 
-    if user_args.gas_price != U256::ZERO {
-        if user_args.gas_price != U256::from_str_radix(&api_tx.gas_price, 10).unwrap_or(U256::ZERO)
-        {
-            errors.push(Mismatch {
-                field: "gas_price".to_string(),
-                api_value: api_tx.gas_price.clone(),
-                user_value: user_args.gas_price.to_string(),
-            });
-        }
+    if user_args.gas_price != U256::ZERO && user_args.gas_price != U256::from_str_radix(&api_tx.gas_price, 10).unwrap_or(U256::ZERO) {
+        errors.push(Mismatch {
+            field: "gas_price".to_string(),
+            api_value: api_tx.gas_price.clone(),
+            user_value: user_args.gas_price.to_string(),
+        });
     }
 
     if errors.is_empty() { Ok(()) } else { Err(errors) }
@@ -243,6 +227,7 @@ mod tests {
     use super::*;
     use std::fs;
 
+    use std::str::FromStr;
     #[test]
     fn test_decode_api_response() {
         let json = fs::read_to_string("../../test/client_tx_response.json")

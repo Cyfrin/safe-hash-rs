@@ -6,13 +6,13 @@ mod output;
 mod tx_signing;
 mod warn;
 
-use alloy::primitives::{Address, ChainId, U256};
+use alloy::primitives::{ChainId, U256};
 use clap::Parser;
 use cli::{CliArgs, Mode};
 use msg_signing::*;
 use output::{SafeWarnings, display_api_transaction_details, display_hashes, display_warnings};
-use safe_utils::{Of, SafeWalletVersion};
-use std::{fs, str::FromStr};
+use safe_utils::Of;
+use std::fs;
 use tx_signing::*;
 use warn::check_suspicious_content;
 
@@ -29,7 +29,7 @@ fn main() {
 
             // Try to get transaction details from API
             let api_tx = match api::get_safe_transaction(
-                chain_id as u64,
+                chain_id,
                 tx_args.safe_address,
                 tx_args.nonce as u64,
             ) {

@@ -1,6 +1,6 @@
 use crate::{cli::MessageArgs, output::SafeHashes};
 use alloy::primitives::ChainId;
-use safe_utils::{DomainHasher, MessageHasher, SafeHasher, SafeWalletVersion};
+use safe_utils::{DomainHasher, MessageHasher, SafeHasher};
 
 pub struct MsgInput {
     pub message: String,
