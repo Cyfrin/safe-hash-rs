@@ -105,6 +105,9 @@ fn main() {
             // Display hashes
             display_hashes(&hashes);
 
+            // Check for suspicious content and union warnings
+            warnings.union(check_suspicious_content(&tx_data, Some(chain_id)));
+
             // Display warnings after the hashes
             display_warnings(&warnings);
         }

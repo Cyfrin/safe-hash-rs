@@ -41,6 +41,19 @@ impl SafeWarnings {
             || self.non_zero_refund_receiver
             || !self.argument_mismatches.is_empty()
     }
+
+    pub fn union(&mut self, other: Self) {
+        // Merge boolean flags using OR
+        self.zero_address |= other.zero_address;
+        self.zero_value |= other.zero_value;
+        self.empty_data |= other.empty_data;
+        self.delegatecall |= other.delegatecall;
+        self.non_zero_gas_token |= other.non_zero_gas_token;
+        self.non_zero_refund_receiver |= other.non_zero_refund_receiver;
+        
+        // Merge vectors using extend
+        self.argument_mismatches.extend(other.argument_mismatches);
+    }
 }
 
 pub fn display_api_transaction_details(tx: &crate::api::SafeTransaction) {
