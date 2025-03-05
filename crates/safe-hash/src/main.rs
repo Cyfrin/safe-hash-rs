@@ -10,7 +10,7 @@ use alloy::primitives::{Address, ChainId, U256};
 use clap::Parser;
 use cli::{CliArgs, Mode};
 use msg_signing::*;
-use output::{display_api_transaction_details, display_hashes, display_warnings};
+use output::{display_api_transaction_details, display_hashes, display_warnings, SafeWarnings};
 use safe_utils::{Of, SafeWalletVersion};
 use std::{fs, str::FromStr};
 use tx_signing::*;
@@ -41,6 +41,7 @@ fn main() {
                 }
             };
 
+            let mut warnings = SafeWarnings::new();
             let tx_data = if let Some(api_tx) = &api_tx {
                 // Display API transaction details
                 display_api_transaction_details(api_tx);
@@ -52,7 +53,7 @@ fn main() {
                     if tx_args.value != U256::ZERO { Some(tx_args.value) } else { None },
                     if tx_args.data != "0x" { Some(tx_args.data.clone()) } else { None },
                 ) {
-                    eprintln!("Warning: {}", e);
+                    warnings.argument_mismatches.push(e);
                 }
 
                 // Use API data for transaction
@@ -86,11 +87,18 @@ fn main() {
                 )
             };
 
-            let hashes =
-                tx_signing_hashes(&tx_data, &tx_args, chain_id, tx_args.safe_version.clone());
+            // Calculate hashes
+            let hashes = tx_signing_hashes(
+                &tx_data,
+                &tx_args,
+                chain_id,
+                tx_args.safe_version.clone(),
+            );
+
+            // Display hashes
             display_hashes(&hashes);
 
-            let warnings = check_suspicious_content(&tx_data, Some(chain_id));
+            // Display warnings after the hashes
             display_warnings(&warnings);
         }
         Mode::Message(msg_args) => {

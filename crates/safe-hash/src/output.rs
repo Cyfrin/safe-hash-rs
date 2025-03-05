@@ -16,6 +16,7 @@ pub struct SafeWarnings {
     pub delegatecall: bool,
     pub non_zero_gas_token: bool,
     pub non_zero_refund_receiver: bool,
+    pub argument_mismatches: Vec<String>,
 }
 
 impl SafeWarnings {
@@ -27,6 +28,7 @@ impl SafeWarnings {
             delegatecall: false,
             non_zero_gas_token: false,
             non_zero_refund_receiver: false,
+            argument_mismatches: Vec::new(),
         }
     }
 
@@ -37,6 +39,7 @@ impl SafeWarnings {
             || self.delegatecall
             || self.non_zero_gas_token
             || self.non_zero_refund_receiver
+            || !self.argument_mismatches.is_empty()
     }
 }
 
@@ -44,23 +47,23 @@ pub fn display_api_transaction_details(tx: &crate::api::SafeTransaction) {
     let mut table_rows = Vec::new();
 
     // Add basic transaction details
-    table_rows.push(vec![cstr!("<green>Safe Address</>").cell(), tx.safe.to_string().cell()]);
-    table_rows.push(vec![cstr!("<green>To</>").cell(), tx.to.to_string().cell()]);
-    table_rows.push(vec![cstr!("<green>Value</>").cell(), tx.value.clone().cell()]);
-    table_rows.push(vec![cstr!("<green>Data</>").cell(), tx.data.clone().cell()]);
-    table_rows.push(vec![cstr!("<green>Operation</>").cell(), tx.operation.to_string().cell()]);
-    table_rows.push(vec![cstr!("<green>Nonce</>").cell(), tx.nonce.to_string().cell()]);
+    table_rows.push(vec![cstr!("<yellow>Safe Address</>").cell(), tx.safe.to_string().cell()]);
+    table_rows.push(vec![cstr!("<yellow>To</>").cell(), tx.to.to_string().cell()]);
+    table_rows.push(vec![cstr!("<yellow>Value</>").cell(), tx.value.clone().cell()]);
+    table_rows.push(vec![cstr!("<yellow>Data</>").cell(), tx.data.clone().cell()]);
+    table_rows.push(vec![cstr!("<yellow>Operation</>").cell(), tx.operation.to_string().cell()]);
+    table_rows.push(vec![cstr!("<yellow>Nonce</>").cell(), tx.nonce.to_string().cell()]);
 
     // Add gas details
-    table_rows.push(vec![cstr!("<green>Safe Tx Gas</>").cell(), tx.safe_tx_gas.to_string().cell()]);
-    table_rows.push(vec![cstr!("<green>Base Gas</>").cell(), tx.base_gas.to_string().cell()]);
-    table_rows.push(vec![cstr!("<green>Gas Price</>").cell(), tx.gas_price.clone().cell()]);
-    table_rows.push(vec![cstr!("<green>Gas Token</>").cell(), tx.gas_token.to_string().cell()]);
-    table_rows.push(vec![cstr!("<green>Refund Receiver</>").cell(), tx.refund_receiver.to_string().cell()]);
+    table_rows.push(vec![cstr!("<yellow>Safe Tx Gas</>").cell(), tx.safe_tx_gas.to_string().cell()]);
+    table_rows.push(vec![cstr!("<yellow>Base Gas</>").cell(), tx.base_gas.to_string().cell()]);
+    table_rows.push(vec![cstr!("<yellow>Gas Price</>").cell(), tx.gas_price.clone().cell()]);
+    table_rows.push(vec![cstr!("<yellow>Gas Token</>").cell(), tx.gas_token.to_string().cell()]);
+    table_rows.push(vec![cstr!("<yellow>Refund Receiver</>").cell(), tx.refund_receiver.to_string().cell()]);
 
     // Add confirmation details
-    table_rows.push(vec![cstr!("<green>Confirmations Required</>").cell(), tx.confirmations_required.to_string().cell()]);
-    table_rows.push(vec![cstr!("<green>Confirmations Count</>").cell(), tx.confirmations.len().to_string().cell()]);
+    table_rows.push(vec![cstr!("<yellow>Confirmations Required</>").cell(), tx.confirmations_required.to_string().cell()]);
+    table_rows.push(vec![cstr!("<yellow>Confirmations Count</>").cell(), tx.confirmations.len().to_string().cell()]);
 
     // Add decoded data if available
     if let Some(decoded) = &tx.data_decoded {
@@ -149,7 +152,10 @@ pub fn display_hashes(hashes: &SafeHashes) {
 
 pub fn display_warnings(warnings: &SafeWarnings) {
     if warnings.has_warnings() {
-        cprintln!("<bold>Warnings:</bold>");
+        println!(); // Add spacing before warnings
+        cprintln!("<bold><red>⚠️  WARNINGS:</red></bold>");
+        
+        // Display standard warnings
         if warnings.zero_address {
             cprintln!("• Transaction is being sent to the zero address");
         }
@@ -168,7 +174,82 @@ pub fn display_warnings(warnings: &SafeWarnings) {
         if warnings.non_zero_refund_receiver {
             cprintln!("• Transaction has a non-zero refund receiver");
         }
-        println!();
-        cprintln!("<bold>Please review the above warnings before signing the transaction.</bold>");
+
+        // Display argument mismatches prominently
+        if !warnings.argument_mismatches.is_empty() {
+            println!(); // Add spacing between standard warnings and argument mismatches
+            cprintln!("<bold><red>🚨 ARGUMENT MISMATCHES:</red></bold>");
+            
+            for mismatch in &warnings.argument_mismatches {
+                // Parse the mismatch message to extract API and user values
+                if let Some((field, api_value, user_value)) = parse_mismatch_message(mismatch) {
+                    let mut mismatch_rows = Vec::new();
+                    mismatch_rows.push(vec![
+                        cstr!("<yellow>API:</>").cell(),
+                        api_value.cell(),
+                    ]);
+                    mismatch_rows.push(vec![
+                        cstr!("<yellow>User:</>").cell(),
+                        user_value.cell(),
+                    ]);
+
+                    // Print the mismatch table
+                    let mismatch_table = mismatch_rows.table()
+                        .title(vec![
+                            format!("{} MISMATCH", field.to_uppercase()).cell().bold(true),
+                            cstr!("<cyan>VALUE</>").cell().bold(true),
+                        ])
+                        .bold(true);
+                    println!("{}", mismatch_table.display().unwrap());
+                    println!(); // Add spacing between tables
+                } else {
+                    // Fallback for any unparseable messages
+                    let mut mismatch_rows = Vec::new();
+                    mismatch_rows.push(vec![
+                        cstr!("<red>Mismatch:</>").cell(),
+                        mismatch.cell(),
+                    ]);
+
+                    let mismatch_table = mismatch_rows.table()
+                        .title(vec![
+                            cstr!("<cyan>MISMATCH</>").cell().bold(true),
+                            cstr!("<cyan>DETAILS</>").cell().bold(true),
+                        ])
+                        .bold(true);
+                    println!("{}", mismatch_table.display().unwrap());
+                    println!(); // Add spacing between tables
+                }
+            }
+        }
+
+        println!(); // Add spacing after warnings
+        cprintln!("<bold><red>Please review the above warnings before signing the transaction.</red></bold>");
     }
+}
+
+fn parse_mismatch_message(message: &str) -> Option<(String, String, String)> {
+    // Handle different message formats
+    if let Some(field_start) = message.find("'") {
+        if let Some(field_end) = message[field_start + 1..].find("'") {
+            let field = message[field_start + 1..field_start + 1 + field_end].to_string();
+            
+            if let Some(api_start) = message.find("API: ") {
+                if let Some(user_start) = message.find("User provided: ") {
+                    let api_value = message[api_start + 5..user_start].trim().trim_end_matches(',').to_string();
+                    let user_value = message[user_start + 14..].trim().to_string();
+                    return Some((field, api_value, user_value));
+                }
+            }
+        }
+    } else if message.contains("Transaction data mismatch") {
+        // Handle data mismatch case
+        if let Some(api_start) = message.find("API: ") {
+            if let Some(user_start) = message.find("User provided: ") {
+                let api_value = message[api_start + 5..user_start].trim().trim_end_matches(',').to_string();
+                let user_value = message[user_start + 14..].trim().to_string();
+                return Some(("data".to_string(), api_value, user_value));
+            }
+        }
+    }
+    None
 }
