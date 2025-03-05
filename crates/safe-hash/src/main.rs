@@ -47,13 +47,11 @@ fn main() {
                 display_api_transaction_details(api_tx);
 
                 // Validate that user-provided details match API data if any were provided
-                if let Err(e) = api::validate_transaction_details(
+                if let Err(errors) = api::validate_transaction_details(
                     api_tx,
-                    tx_args.to,
-                    if tx_args.value != U256::ZERO { Some(tx_args.value) } else { None },
-                    if tx_args.data != "0x" { Some(tx_args.data.clone()) } else { None },
+                    &tx_args
                 ) {
-                    warnings.argument_mismatches.push(e);
+                    warnings.argument_mismatches.extend(errors);
                 }
 
                 // Use API data for transaction

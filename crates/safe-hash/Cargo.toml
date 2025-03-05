@@ -18,4 +18,5 @@ tokio.workspace = true
 color-print.workspace = true
 cli-table.workspace = true
 sty.workspace = true
+semver.workspace = true
 safe-utils = { path = "../safe-utils"}
