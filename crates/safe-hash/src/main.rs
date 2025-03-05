@@ -95,6 +95,13 @@ fn main() {
                 tx_args.safe_version.clone(),
             );
 
+            // Validate Safe Transaction Hash against API data if available
+            if let Some(api_tx) = &api_tx {
+                if let Err(e) = api::validate_safe_tx_hash(api_tx, &hashes.safe_tx_hash) {
+                    warnings.argument_mismatches.push(e);
+                }
+            }
+
             // Display hashes
             display_hashes(&hashes);
 

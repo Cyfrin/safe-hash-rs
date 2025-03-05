@@ -1,0 +1,90 @@
+{
+    "messageHash": "0xd29cc2a8ce604f0cea069a545437fa79758062d093de335d73378ac76f6508d0",
+    "status": "NEEDS_CONFIRMATION",
+    "logoUri": null,
+    "name": null,
+    "message": {
+      "types": {
+        "Vote": [
+          {
+            "name": "from",
+            "type": "address"
+          },
+          {
+            "name": "space",
+            "type": "string"
+          },
+          {
+            "name": "timestamp",
+            "type": "uint64"
+          },
+          {
+            "name": "proposal",
+            "type": "bytes32"
+          },
+          {
+            "name": "choice",
+            "type": "uint32"
+          },
+          {
+            "name": "reason",
+            "type": "string"
+          },
+          {
+            "name": "app",
+            "type": "string"
+          },
+          {
+            "name": "metadata",
+            "type": "string"
+          }
+        ],
+        "EIP712Domain": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "version",
+            "type": "string"
+          }
+        ]
+      },
+      "domain": {
+        "name": "snapshot",
+        "version": "0.1.4"
+      },
+      "message": {
+        "app": "snapshot",
+        "from": "0x1c694fc3006d81ff4a56f97e1b99529066a23725",
+        "space": "beanstalkdao.eth",
+        "choice": "1",
+        "reason": "",
+        "metadata": "{}",
+        "proposal": "0x07157c4eacf799f34d340df37ab854c8fc1a9867dec53a36488fefd4aee597dd",
+        "timestamp": "1708620648"
+      },
+      "primaryType": "Vote"
+    },
+    "creationTimestamp": 1708620657823,
+    "modifiedTimestamp": 1708620751476,
+    "confirmationsSubmitted": 1,
+    "confirmationsRequired": 2,
+    "proposedBy": {
+      "value": "0xAF43958ad62389BE3E0B553dFd259Ec335814c1C",
+      "name": null,
+      "logoUri": null
+    },
+    "confirmations": [
+      {
+        "owner": {
+          "value": "0x53A26f48ED901336D7C165B85E6F43d9F8dBeAA7",
+          "name": null,
+          "logoUri": null
+        },
+        "signature": "0xe8cb7f10157253c53c9ae300a518252f747e81a9af2ec339283f51ca65704daf4b6ca774e1c63dcfc808231aeaae6b187099a479a3e36d6ea0a426d42a7872b81c"
+      }
+    ],
+    "preparedSignature": null,
+    "origin": "{}"
+}

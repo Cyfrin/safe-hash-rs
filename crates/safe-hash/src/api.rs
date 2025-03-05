@@ -1,6 +1,8 @@
-use alloy::primitives::{Address, U256};
+use alloy::primitives::{Address, ChainId, U256, hex, FixedBytes};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, str::FromStr};
+use crate::{tx_signing::{TxInput, tx_signing_hashes}, cli::TransactionArgs};
+use safe_utils::SafeWalletVersion;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -126,6 +128,25 @@ pub fn validate_transaction_details(
                 api_tx.data, data
             ));
         }
+    }
+
+    Ok(())
+}
+
+pub fn validate_safe_tx_hash(
+    api_tx: &SafeTransaction,
+    calculated_hash: &FixedBytes<32>,
+) -> Result<(), String> {
+    // Remove 0x prefix if present and parse as hex
+    let api_hash = U256::from_str_radix(api_tx.safe_tx_hash.trim_start_matches("0x"), 16)
+        .map_err(|e| format!("Failed to parse API safe_tx_hash: {}", e))?;
+    let calculated_bytes: [u8; 32] = calculated_hash.as_slice().try_into().unwrap();
+    if api_hash != U256::from_be_bytes(calculated_bytes) {
+        return Err(format!(
+            "Safe Transaction Hash mismatch. API: {}, Calculated: {}",
+            api_tx.safe_tx_hash,
+            hex::encode(calculated_hash)
+        ));
     }
 
     Ok(())
