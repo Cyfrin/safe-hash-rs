@@ -20,7 +20,8 @@ pub fn msg_signing_hashes(
 ) -> SafeHashes {
     // Calculate hashes
     let domain_hash = {
-        let domain_hasher = DomainHasher::new(args.safe_version.clone(), chain_id, args.safe_address);
+        let domain_hasher =
+            DomainHasher::new(args.safe_version.clone(), chain_id, args.safe_address);
         domain_hasher.hash()
     };
 
@@ -64,8 +65,7 @@ mod tests {
             .unwrap_or_else(|_| panic!("Failed to read message file: {}", args.input_file));
         let msg_data = MsgInput::new(message);
         let chain_id = ChainId::of("sepolia").unwrap();
-        let hashes =
-            msg_signing_hashes(&msg_data, &args, chain_id);
+        let hashes = msg_signing_hashes(&msg_data, &args, chain_id);
 
         // Note: These expected values are placeholders and need to be replaced with actual values
         // from a known good test case

@@ -10,7 +10,7 @@ use alloy::primitives::{Address, ChainId, U256};
 use clap::Parser;
 use cli::{CliArgs, Mode};
 use msg_signing::*;
-use output::{display_api_transaction_details, display_hashes, display_warnings, SafeWarnings};
+use output::{SafeWarnings, display_api_transaction_details, display_hashes, display_warnings};
 use safe_utils::{Of, SafeWalletVersion};
 use std::{fs, str::FromStr};
 use tx_signing::*;
@@ -47,10 +47,7 @@ fn main() {
                 display_api_transaction_details(api_tx);
 
                 // Validate that user-provided details match API data if any were provided
-                if let Err(errors) = api::validate_transaction_details(
-                    api_tx,
-                    &tx_args
-                ) {
+                if let Err(errors) = api::validate_transaction_details(api_tx, &tx_args) {
                     warnings.argument_mismatches.extend(errors);
                 }
 
@@ -86,12 +83,8 @@ fn main() {
             };
 
             // Calculate hashes
-            let hashes = tx_signing_hashes(
-                &tx_data,
-                &tx_args,
-                chain_id,
-                tx_args.safe_version.clone(),
-            );
+            let hashes =
+                tx_signing_hashes(&tx_data, &tx_args, chain_id, tx_args.safe_version.clone());
 
             // Validate Safe Transaction Hash against API data if available
             if let Some(api_tx) = &api_tx {
@@ -117,8 +110,7 @@ fn main() {
             let message = fs::read_to_string(&msg_args.input_file)
                 .unwrap_or_else(|_| panic!("Failed to read message file: {}", msg_args.input_file));
             let msg_data = MsgInput::new(message);
-            let hashes =
-                msg_signing_hashes(&msg_data, &msg_args, chain_id);
+            let hashes = msg_signing_hashes(&msg_data, &msg_args, chain_id);
             display_hashes(&hashes);
         }
     }

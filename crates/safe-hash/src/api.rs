@@ -1,8 +1,12 @@
-use alloy::primitives::{Address, ChainId, U256, hex, FixedBytes};
+use crate::{
+    cli::TransactionArgs,
+    output::Mismatch,
+    tx_signing::{TxInput, tx_signing_hashes},
+};
+use alloy::primitives::{Address, ChainId, FixedBytes, U256, hex};
+use safe_utils::SafeWalletVersion;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, str::FromStr};
-use crate::{cli::TransactionArgs, output::Mismatch, tx_signing::{tx_signing_hashes, TxInput}};
-use safe_utils::SafeWalletVersion;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -75,7 +79,11 @@ pub struct SafeApiResponse {
 
 const API_BASE_URL: &str = "https://safe-client.safe.global/v1";
 
-pub fn get_safe_transaction(chain_id: u64, safe_address: Address, nonce: u64) -> Result<SafeTransaction, Box<dyn std::error::Error>> {
+pub fn get_safe_transaction(
+    chain_id: u64,
+    safe_address: Address,
+    nonce: u64,
+) -> Result<SafeTransaction, Box<dyn std::error::Error>> {
     let url = format!(
         "{}/chains/{}/safes/{}/multisig-transactions/raw?nonce={}",
         API_BASE_URL, chain_id, safe_address, nonce
@@ -192,7 +200,8 @@ pub fn validate_transaction_details(
     }
 
     if user_args.gas_price != U256::ZERO {
-        if user_args.gas_price != U256::from_str_radix(&api_tx.gas_price, 10).unwrap_or(U256::ZERO) {
+        if user_args.gas_price != U256::from_str_radix(&api_tx.gas_price, 10).unwrap_or(U256::ZERO)
+        {
             errors.push(Mismatch {
                 field: "gas_price".to_string(),
                 api_value: api_tx.gas_price.clone(),
@@ -201,11 +210,7 @@ pub fn validate_transaction_details(
         }
     }
 
-    if errors.is_empty() {
-        Ok(())
-    } else {
-        Err(errors)
-    }
+    if errors.is_empty() { Ok(()) } else { Err(errors) }
 }
 
 pub fn validate_safe_tx_hash(
@@ -213,11 +218,13 @@ pub fn validate_safe_tx_hash(
     calculated_hash: &FixedBytes<32>,
 ) -> Result<(), Mismatch> {
     // Remove 0x prefix if present and parse as hex
-    let api_hash = U256::from_str_radix(api_tx.safe_tx_hash.trim_start_matches("0x"), 16)
-        .map_err(|e| Mismatch {
-            field: "safe_tx_hash".to_string(),
-            api_value: "".to_string(),
-            user_value: format!("Failed to parse API safe_tx_hash: {}", e),
+    let api_hash =
+        U256::from_str_radix(api_tx.safe_tx_hash.trim_start_matches("0x"), 16).map_err(|e| {
+            Mismatch {
+                field: "safe_tx_hash".to_string(),
+                api_value: "".to_string(),
+                user_value: format!("Failed to parse API safe_tx_hash: {}", e),
+            }
         })?;
     let calculated_bytes: [u8; 32] = calculated_hash.as_slice().try_into().unwrap();
     if api_hash != U256::from_be_bytes(calculated_bytes) {
@@ -238,14 +245,18 @@ mod tests {
 
     #[test]
     fn test_decode_api_response() {
-        let json = fs::read_to_string("../../test/client_tx_response.json").expect("Failed to read test file");
+        let json = fs::read_to_string("../../test/client_tx_response.json")
+            .expect("Failed to read test file");
         let response: SafeApiResponse = serde_json::from_str(&json).expect("Failed to decode JSON");
-        
+
         assert_eq!(response.count, 1);
         assert_eq!(response.results.len(), 1);
-        
+
         let tx = &response.results[0];
-        assert_eq!(tx.safe, Address::from_str("0x1c694Fc3006D81ff4a56F97E1b99529066a23725").unwrap());
+        assert_eq!(
+            tx.safe,
+            Address::from_str("0x1c694Fc3006D81ff4a56F97E1b99529066a23725").unwrap()
+        );
         assert_eq!(tx.to, Address::from_str("0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48").unwrap());
         assert_eq!(tx.value, "0");
         assert_eq!(tx.nonce, 63);
@@ -314,7 +325,8 @@ mod tests {
     fn test_validate_transaction_details_to_mismatch() {
         let api_tx = create_test_tx();
         let mut user_args = TransactionArgs::default();
-        user_args.to = Some(Address::from_str("0x0000000000000000000000000000000000000001").unwrap());
+        user_args.to =
+            Some(Address::from_str("0x0000000000000000000000000000000000000001").unwrap());
 
         let result = validate_transaction_details(&api_tx, &user_args).unwrap_err();
         assert_eq!(result.len(), 1);
@@ -366,7 +378,8 @@ mod tests {
     fn test_validate_transaction_details_gas_token_mismatch() {
         let api_tx = create_test_tx();
         let mut user_args = TransactionArgs::default();
-        user_args.gas_token = Address::from_str("0x0000000000000000000000000000000000000001").unwrap();
+        user_args.gas_token =
+            Address::from_str("0x0000000000000000000000000000000000000001").unwrap();
 
         let result = validate_transaction_details(&api_tx, &user_args).unwrap_err();
         assert_eq!(result.len(), 1);
@@ -379,7 +392,8 @@ mod tests {
     fn test_validate_transaction_details_refund_receiver_mismatch() {
         let api_tx = create_test_tx();
         let mut user_args = TransactionArgs::default();
-        user_args.refund_receiver = Address::from_str("0x0000000000000000000000000000000000000001").unwrap();
+        user_args.refund_receiver =
+            Address::from_str("0x0000000000000000000000000000000000000001").unwrap();
 
         let result = validate_transaction_details(&api_tx, &user_args).unwrap_err();
         assert_eq!(result.len(), 1);
@@ -431,17 +445,86 @@ mod tests {
     fn test_validate_transaction_details_multiple_mismatches() {
         let api_tx = create_test_tx();
         let mut user_args = TransactionArgs::default();
-        user_args.to = Some(Address::from_str("0x0000000000000000000000000000000000000001").unwrap());
+        user_args.to =
+            Some(Address::from_str("0x0000000000000000000000000000000000000001").unwrap());
         user_args.value = U256::from(2000000);
         user_args.data = "0x5678".to_string();
 
         let result = validate_transaction_details(&api_tx, &user_args).unwrap_err();
         assert_eq!(result.len(), 3);
-        
+
         // Check all mismatches are present
         let fields: Vec<_> = result.iter().map(|m| &m.field).collect();
         assert!(fields.contains(&&"to".to_string()));
         assert!(fields.contains(&&"value".to_string()));
         assert!(fields.contains(&&"data".to_string()));
     }
-} 
+
+    #[test]
+    fn test_validate_safe_tx_hash_success() {
+        let mut api_tx = create_test_tx();
+        // Set a known safe_tx_hash
+        api_tx.safe_tx_hash =
+            "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef".to_string();
+
+        // Create a matching calculated hash
+        let calculated_hash = FixedBytes::from_slice(
+            &hex::decode("1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef")
+                .unwrap(),
+        );
+
+        assert!(validate_safe_tx_hash(&api_tx, &calculated_hash).is_ok());
+    }
+
+    #[test]
+    fn test_validate_safe_tx_hash_mismatch() {
+        let mut api_tx = create_test_tx();
+        // Set a known safe_tx_hash
+        api_tx.safe_tx_hash =
+            "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef".to_string();
+
+        // Create a different calculated hash
+        let calculated_hash = FixedBytes::from_slice(
+            &hex::decode("abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890")
+                .unwrap(),
+        );
+
+        let result = validate_safe_tx_hash(&api_tx, &calculated_hash).unwrap_err();
+        assert_eq!(result.field, "safe_tx_hash");
+        assert_eq!(result.api_value, api_tx.safe_tx_hash);
+        assert_eq!(result.user_value, hex::encode(calculated_hash));
+    }
+
+    #[test]
+    fn test_validate_safe_tx_hash_invalid_hex() {
+        let mut api_tx = create_test_tx();
+        // Set an invalid hex string
+        api_tx.safe_tx_hash = "0xinvalid_hex".to_string();
+
+        let calculated_hash = FixedBytes::from_slice(
+            &hex::decode("1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef")
+                .unwrap(),
+        );
+
+        let result = validate_safe_tx_hash(&api_tx, &calculated_hash).unwrap_err();
+        assert_eq!(result.field, "safe_tx_hash");
+        assert!(result.api_value.is_empty());
+        assert!(result.user_value.contains("Failed to parse API safe_tx_hash"));
+    }
+
+    #[test]
+    fn test_validate_safe_tx_hash_with_0x_prefix() {
+        let mut api_tx = create_test_tx();
+        // Set a hash with 0x prefix
+        api_tx.safe_tx_hash =
+            "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef".to_string();
+
+        // Create a matching calculated hash
+        let calculated_hash = FixedBytes::from_slice(
+            &hex::decode("1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef")
+                .unwrap(),
+        );
+
+        assert!(validate_safe_tx_hash(&api_tx, &calculated_hash).is_ok());
+    }
+}
