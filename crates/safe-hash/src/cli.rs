@@ -42,8 +42,8 @@ pub struct TransactionArgs {
     pub safe_version: SafeWalletVersion,
 
     /// Address of the contract to which the safe-address sends calldata to.
-    #[arg(short, long, required = true)]
-    pub to: Address,
+    #[arg(short, long)]
+    pub to: Option<Address>,
 
     /// Value asked in the transaction (relates to eth)
     #[arg(long, default_value_t = U256::ZERO)]
@@ -164,7 +164,7 @@ mod tests {
                 tx_args.safe_address,
                 address!("0x1234567890123456789012345678901234567890")
             );
-            assert_eq!(tx_args.to, address!("0x2234567890123456789012345678901234567890"));
+            assert_eq!(tx_args.to, Some(address!("0x2234567890123456789012345678901234567890")));
             assert_eq!(tx_args.value, U256::from(0));
             assert_eq!(tx_args.data, "0xabcd");
         } else {

@@ -40,6 +40,76 @@ impl SafeWarnings {
     }
 }
 
+pub fn display_api_transaction_details(tx: &crate::api::SafeTransaction) {
+    let mut table_rows = Vec::new();
+
+    // Add basic transaction details
+    table_rows.push(vec![cstr!("<green>Safe Address</>").cell(), tx.safe.to_string().cell()]);
+    table_rows.push(vec![cstr!("<green>To</>").cell(), tx.to.to_string().cell()]);
+    table_rows.push(vec![cstr!("<green>Value</>").cell(), tx.value.clone().cell()]);
+    table_rows.push(vec![cstr!("<green>Data</>").cell(), tx.data.clone().cell()]);
+    table_rows.push(vec![cstr!("<green>Operation</>").cell(), tx.operation.to_string().cell()]);
+    table_rows.push(vec![cstr!("<green>Nonce</>").cell(), tx.nonce.to_string().cell()]);
+
+    // Add gas details
+    table_rows.push(vec![cstr!("<green>Safe Tx Gas</>").cell(), tx.safe_tx_gas.to_string().cell()]);
+    table_rows.push(vec![cstr!("<green>Base Gas</>").cell(), tx.base_gas.to_string().cell()]);
+    table_rows.push(vec![cstr!("<green>Gas Price</>").cell(), tx.gas_price.clone().cell()]);
+    table_rows.push(vec![cstr!("<green>Gas Token</>").cell(), tx.gas_token.to_string().cell()]);
+    table_rows.push(vec![cstr!("<green>Refund Receiver</>").cell(), tx.refund_receiver.to_string().cell()]);
+
+    // Add confirmation details
+    table_rows.push(vec![cstr!("<green>Confirmations Required</>").cell(), tx.confirmations_required.to_string().cell()]);
+    table_rows.push(vec![cstr!("<green>Confirmations Count</>").cell(), tx.confirmations.len().to_string().cell()]);
+
+    // Add decoded data if available
+    if let Some(decoded) = &tx.data_decoded {
+        // Create parameters table with method and parameters
+        let mut param_rows = Vec::new();
+        param_rows.push(vec![
+            cstr!("<blue>Method</>").cell(),
+            decoded.method.clone().cell(),
+        ]);
+        
+        for param in &decoded.parameters {
+            param_rows.push(vec![
+                cstr!("<blue>Parameter</>").cell(),
+                format!("{}: {}", param.r#type, param.value).cell(),
+            ]);
+        }
+        
+        // Print the main transaction details table
+        let table = table_rows.table()
+            .title(vec![
+                cstr!("<cyan>FIELD</>").cell().bold(true),
+                cstr!("<cyan>VALUE</>").cell().bold(true),
+            ])
+            .bold(true);
+        println!("{}", table.display().unwrap());
+        
+        // Print the parameters table if we have any
+        if !param_rows.is_empty() {
+            println!(); // Add spacing between tables
+            let param_table = param_rows.table()
+                .title(vec![
+                    cstr!("<cyan>SELECTOR</>").cell().bold(true),
+                    cstr!("<cyan>VALUE</>").cell().bold(true),
+                ])
+                .bold(true);
+            println!("{}", param_table.display().unwrap());
+        }
+    } else {
+        // If no decoded data, just print the main table
+        let table = table_rows.table()
+            .title(vec![
+                cstr!("<cyan>FIELD</>").cell().bold(true),
+                cstr!("<cyan>VALUE</>").cell().bold(true),
+            ])
+            .bold(true);
+        println!("{}", table.display().unwrap());
+    }
+}
+
 pub fn display_hashes(hashes: &SafeHashes) {
     let mut table_rows = Vec::new();
 
@@ -64,7 +134,7 @@ pub fn display_hashes(hashes: &SafeHashes) {
     let table = table_rows
         .table()
         .title(vec![
-            cstr!("<cyan>TYPE</>").cell().bold(true),
+            cstr!("<cyan>HASH TYPE</>").cell().bold(true),
             cstr!("<cyan>CALCULATED HASHES</cyan>").cell().bold(true),
         ])
         .bold(true);

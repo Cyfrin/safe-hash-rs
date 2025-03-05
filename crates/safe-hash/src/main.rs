@@ -1,3 +1,4 @@
+mod api;
 mod cli;
 mod etherscan;
 mod msg_signing;
@@ -5,13 +6,13 @@ mod output;
 mod tx_signing;
 mod warn;
 
-use alloy::primitives::ChainId;
+use alloy::primitives::{Address, ChainId, U256};
 use clap::Parser;
 use cli::{CliArgs, Mode};
 use msg_signing::*;
-use output::{display_hashes, display_warnings};
+use output::{display_api_transaction_details, display_hashes, display_warnings};
 use safe_utils::{Of, SafeWalletVersion};
-use std::fs;
+use std::{fs, str::FromStr};
 use tx_signing::*;
 use warn::check_suspicious_content;
 
@@ -26,18 +27,64 @@ fn main() {
                 panic!("chain {:?} is supported but id is not found", tx_args.chain)
             });
 
-            let tx_data = TxInput::new(
-                tx_args.to,
-                tx_args.value,
-                tx_args.data.clone(),
-                tx_args.operation,
-                tx_args.safe_tx_gas,
-                tx_args.base_gas,
-                tx_args.gas_price,
-                tx_args.gas_token,
-                tx_args.refund_receiver,
-                String::new(), // No signatures needed for signing
-            );
+            // Try to get transaction details from API
+            let api_tx = match api::get_safe_transaction(
+                chain_id as u64,
+                tx_args.safe_address,
+                tx_args.nonce as u64,
+            ) {
+                Ok(tx) => Some(tx),
+                Err(e) => {
+                    eprintln!("Warning: Could not fetch transaction from API: {}", e);
+                    eprintln!("Falling back to offline mode with provided parameters");
+                    None
+                }
+            };
+
+            let tx_data = if let Some(api_tx) = &api_tx {
+                // Display API transaction details
+                display_api_transaction_details(api_tx);
+
+                // Validate that user-provided details match API data if any were provided
+                if let Err(e) = api::validate_transaction_details(
+                    api_tx,
+                    tx_args.to,
+                    if tx_args.value != U256::ZERO { Some(tx_args.value) } else { None },
+                    if tx_args.data != "0x" { Some(tx_args.data.clone()) } else { None },
+                ) {
+                    eprintln!("Warning: {}", e);
+                }
+
+                // Use API data for transaction
+                TxInput::new(
+                    api_tx.to,
+                    U256::from_str_radix(&api_tx.value, 10).unwrap_or(U256::ZERO),
+                    api_tx.data.clone(),
+                    api_tx.operation,
+                    U256::from(api_tx.safe_tx_gas),
+                    U256::from(api_tx.base_gas),
+                    U256::from_str_radix(&api_tx.gas_price, 10).unwrap_or(U256::ZERO),
+                    api_tx.gas_token,
+                    api_tx.refund_receiver,
+                    api_tx.signatures.clone(),
+                )
+            } else {
+                // Use user-provided data for transaction
+                TxInput::new(
+                    tx_args.to.unwrap_or_else(|| {
+                        panic!("'to' address is required in offline mode")
+                    }),
+                    tx_args.value,
+                    tx_args.data.clone(),
+                    tx_args.operation,
+                    tx_args.safe_tx_gas,
+                    tx_args.base_gas,
+                    tx_args.gas_price,
+                    tx_args.gas_token,
+                    tx_args.refund_receiver,
+                    String::new(), // No signatures needed for signing
+                )
+            };
 
             let hashes =
                 tx_signing_hashes(&tx_data, &tx_args, chain_id, tx_args.safe_version.clone());

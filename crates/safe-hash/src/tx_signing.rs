@@ -118,7 +118,7 @@ mod tests {
             nonce,
             safe_address,
             safe_version: SafeWalletVersion::new(1, 3, 0),
-            to: to_address,
+            to: Some(to_address),
             value: U256::ZERO,
             data: data.clone(),
             operation: 0,
