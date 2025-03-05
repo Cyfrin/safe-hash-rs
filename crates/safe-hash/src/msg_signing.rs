@@ -17,11 +17,10 @@ pub fn msg_signing_hashes(
     msg_data: &MsgInput,
     args: &MessageArgs,
     chain_id: ChainId,
-    safe_version: SafeWalletVersion,
 ) -> SafeHashes {
     // Calculate hashes
     let domain_hash = {
-        let domain_hasher = DomainHasher::new(safe_version.clone(), chain_id, args.safe_address);
+        let domain_hasher = DomainHasher::new(args.safe_version.clone(), chain_id, args.safe_address);
         domain_hasher.hash()
     };
 
@@ -66,7 +65,7 @@ mod tests {
         let msg_data = MsgInput::new(message);
         let chain_id = ChainId::of("sepolia").unwrap();
         let hashes =
-            msg_signing_hashes(&msg_data, &args, chain_id, SafeWalletVersion::new(1, 3, 0));
+            msg_signing_hashes(&msg_data, &args, chain_id);
 
         // Note: These expected values are placeholders and need to be replaced with actual values
         // from a known good test case

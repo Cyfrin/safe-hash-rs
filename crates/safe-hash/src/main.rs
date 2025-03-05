@@ -120,7 +120,7 @@ fn main() {
                 .unwrap_or_else(|_| panic!("Failed to read message file: {}", msg_args.input_file));
             let msg_data = MsgInput::new(message);
             let hashes =
-                msg_signing_hashes(&msg_data, &msg_args, chain_id, SafeWalletVersion::new(1, 3, 0));
+                msg_signing_hashes(&msg_data, &msg_args, chain_id);
             display_hashes(&hashes);
         }
     }
