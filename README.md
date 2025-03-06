@@ -5,6 +5,15 @@
 
 ## Installation 
 
+### Cyfrinup
+
+**Cyfrinup** simplifies the installation and management of Cyfrin tools.
+
+Follow the instructions to install [here](https://github.com/Cyfrin/up).
+
+Run `safe-hash --version` to check the installation.
+
+
 ### Shell (For Linux, Mac, WSL)
 
 ```bash
