@@ -7,9 +7,9 @@
 
 ### Cyfrinup
 
-**Cyfrinup** simplifies the installation and management of Cyfrin tools.
+This method simplifies the installation and management of Cyfrin tools.
 
-Follow the instructions to install [here](https://github.com/Cyfrin/up).
+Instructions [here](https://github.com/Cyfrin/up).
 
 Run `safe-hash --version` to check the installation.
 
