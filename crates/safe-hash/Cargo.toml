@@ -1,8 +1,11 @@
 [package]
 name = "safe-hash"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2024"
 default-run = "safe-hash"
+repository = "https://github.com/Cyfrin/safe-hash-rs"
+description = "Verify Safe Wallet Transactions and Messages"
+homepage = "Verify Safe Wallet Transactions and Messages"
 
 [[bin]]
 name = "safe-hash"
@@ -19,4 +22,4 @@ color-print.workspace = true
 cli-table.workspace = true
 sty.workspace = true
 semver.workspace = true
-safe-utils = { path = "../safe-utils"}
+safe-utils = { path = "../safe-utils", version = "0.0.1" }
