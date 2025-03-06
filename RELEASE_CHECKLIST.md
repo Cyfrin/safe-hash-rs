@@ -11,3 +11,5 @@ This checklist is meant to be used as a guide for the release process.
 
 - [ ] Switch to `main` branch
 - [ ] Run `cargo release patch --no-publish`. It will perform a dry run and make sure the changes are as intended. If satisfied, run `cargo release patch --no-publish execute`
+
+For cutting a minor release, replace `patch` with `minor` above
