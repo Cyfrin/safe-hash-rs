@@ -48,7 +48,11 @@ fn main() {
 
                 // Validate that user-provided details match API data if any were provided
                 if let Err(errors) = api::validate_transaction_details(api_tx, &tx_args) {
-                    warnings.argument_mismatches.extend(errors);
+                    if !errors.is_empty() {
+                        warnings.argument_mismatches.extend(errors);
+                        display_warnings(&warnings);
+                        return;
+                    }
                 }
 
                 // Use API data for transaction
