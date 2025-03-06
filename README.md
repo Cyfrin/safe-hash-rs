@@ -3,7 +3,33 @@
 > [!CAUTION]
 > It is under development and is not fully tested. Please do not use it in production environments.
 
-## Installation From Source
+## Installation 
+
+### Shell (For Linux, Mac, WSL)
+
+```bash
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/Cyfrin/safe-hash-rs/releases/latest/download/safe-hash-installer.sh | sh
+```
+
+### Powershell (For Windows)
+
+```
+powershell -ExecutionPolicy Bypass -c "irm https://github.com/Cyfrin/safe-hash-rs/releases/latest/download/safe-hash-installer.ps1 | iex"
+```
+
+### Homebrew 
+
+```
+brew install cyfrin/tap/safe-hash
+```
+
+### npm
+
+```
+npm install -g @cyfrin/safe-hash
+```
+
+### Source
 
 **Prerequisite: [Rust](https://www.rust-lang.org/tools/install)**
 
