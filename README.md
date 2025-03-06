@@ -29,24 +29,6 @@ brew install cyfrin/tap/safe-hash
 npm install -g @cyfrin/safe-hash
 ```
 
-### Source
-
-**Prerequisite: [Rust](https://www.rust-lang.org/tools/install)**
-
-```bash
-# Clone the repository
-git clone https://github.com/cyfrin/safe-hash-rs.git
-cd safe-hash-rs
-
-# Option 1: Build locally
-cargo build --release
-# The binary will be available at target/release/safe-hash
-
-# Option 2: Install globally
-cargo install --path crates/safe-hash
-# The binary will be available as 'safe-hash' in your PATH
-```
-
 ## Usage
 
 This tool helps protect against possible phishing or compromised UI attacks by allowing local verification of transaction and message hashes before signing.
