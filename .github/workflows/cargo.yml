@@ -46,6 +46,4 @@ jobs:
 
       - name: Run tests
         run: |
-          cargo build
-          cargo install cargo-tree
           ! cargo tree -i openssl --target all
