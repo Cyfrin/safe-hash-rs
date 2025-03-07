@@ -27,7 +27,7 @@ jobs:
           cargo test -- --nocapture
 
   decline-openssl-dependencies:
-    name: Tests
+    name: Decline openssl
     runs-on: ubuntu-latest
     steps:
 
@@ -46,5 +46,6 @@ jobs:
 
       - name: Run tests
         run: |
+          cargo build
           cargo install cargo-tree
           ! cargo tree -i openssl --target all
