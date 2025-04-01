@@ -10,8 +10,11 @@ use alloy::primitives::{ChainId, U256};
 use clap::Parser;
 use cli::{CliArgs, Mode};
 use msg_signing::*;
-use output::{SafeWarnings, display_api_transaction_details, display_hashes, display_warnings};
-use safe_utils::Of;
+use output::{
+    SafeWarnings, display_api_transaction_details, display_eip712_hash, display_hashes,
+    display_warnings,
+};
+use safe_utils::{Eip712Hasher, Of};
 use std::fs;
 use tx_signing::*;
 use warn::check_suspicious_content;
@@ -117,6 +120,13 @@ fn main() {
             let hashes = msg_signing_hashes(&msg_data, &msg_args, chain_id);
             display_hashes(&hashes);
         }
+        Mode::Eip712(eip712_args) => {
+            let message = fs::read_to_string(&eip712_args.file).unwrap_or_else(|_| {
+                panic!("Failed to read file: {}", eip712_args.file.as_os_str().to_string_lossy())
+            });
+            let msg_data = Eip712Hasher::new(message);
+            display_eip712_hash(&msg_data.hash().expect("Failed to EIP 712 Hash"));
+        }
     }
 }
 
@@ -208,6 +218,35 @@ mod tests {
         // Safe transaction hash
         assert!(
             stdout.contains("1866b559f56261ada63528391b93a1fe8e2e33baf7cace94fc6b42202d16ea08")
+        );
+    }
+
+    #[test]
+    fn test_eip712_hash() {
+        // Run the safe-hash command with some test arguments
+        let output = Command::new("cargo")
+            .arg("run")
+            .arg("--")
+            .arg("typed")
+            .arg("--file")
+            .arg("../../test/eip712_message.json")
+            .output()
+            .expect("Failed to execute command");
+
+        // Assert that the command executed successfully
+        assert!(
+            output.status.success(),
+            "Command failed: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        println!("{}", stdout);
+
+        // Check for essential content without formatting
+        // Check for hash
+        assert!(
+            stdout.contains("a85c2e2b118698e88db68a8105b794a8cc7cec074e89ef991cb4f5f533819cc2")
         );
     }
 }

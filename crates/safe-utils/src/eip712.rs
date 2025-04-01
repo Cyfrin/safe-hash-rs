@@ -7,11 +7,11 @@ pub struct Eip712Hasher {
 }
 
 impl Eip712Hasher {
-    fn new(typed_message_string: String) -> Self {
+    pub fn new(typed_message_string: String) -> Self {
         Self { typed_message_string }
     }
 
-    fn hash(&self) -> Result<String> {
+    pub fn hash(&self) -> Result<String> {
         let hased_data = hash_structured_data(from_str::<EIP712>(&self.typed_message_string)?)
             .map_err(|_| "Failed to hash".to_string())?;
         let hashed_string = &format!("{:x}", hased_data)[..];

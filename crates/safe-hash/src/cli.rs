@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use alloy::primitives::{Address, U256};
 use clap::{Parser, Subcommand};
 use safe_utils::{SafeWalletVersion, get_all_supported_chain_names};
@@ -19,6 +21,10 @@ pub enum Mode {
     /// Message signing mode
     #[command(name = "msg")]
     Message(MessageArgs),
+
+    /// Encode EIP 712 typed message
+    #[command(name = "typed")]
+    Eip712(Eip712Args),
 }
 
 #[derive(Parser, Debug)]
@@ -114,6 +120,13 @@ pub struct MessageArgs {
     /// Path to the message file to be signed
     #[arg(short, long, required = true)]
     pub input_file: String,
+}
+
+#[derive(Parser, Debug)]
+pub struct Eip712Args {
+    /// File contiaing the JSON formatted EIP 712 spec
+    #[arg(short, long, required = true)]
+    pub file: PathBuf,
 }
 
 impl CliArgs {
