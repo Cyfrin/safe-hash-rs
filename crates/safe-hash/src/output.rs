@@ -230,3 +230,14 @@ pub fn display_warnings(warnings: &SafeWarnings) {
         );
     }
 }
+
+pub fn display_eip712_hash(hash: &String) {
+    let mut table_rows = Vec::new();
+
+    table_rows.push(vec![cstr!("<green>EIP 712 Hash</>").cell(), hash.cell()]);
+
+    let table = table_rows.table().bold(true);
+
+    let table_display = table.display().unwrap();
+    println!("{}", table_display);
+}
