@@ -17,7 +17,7 @@ jobs:
 
       - name: Install Deno
         run: |
-          cargo install deno --locked
+          curl -fsSL https://deno.land/install.sh | sh
 
       - name: Checkout Sources
         uses: actions/checkout@v4
