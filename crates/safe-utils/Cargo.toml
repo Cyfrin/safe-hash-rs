@@ -7,5 +7,7 @@ publish = false
 [dependencies]
 semver.workspace = true
 alloy.workspace = true
-eip712_enc = "0.1.2"
 serde_json.workspace = true
+
+[build-dependencies]
+target-triple = "0.1.4"

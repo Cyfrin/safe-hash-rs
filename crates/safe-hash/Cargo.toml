@@ -24,5 +24,3 @@ sty.workspace = true
 semver.workspace = true
 safe-utils = { path = "../safe-utils", version = "0.0.2" }
 
-[build-dependencies]
-target-triple = "0.1.4"

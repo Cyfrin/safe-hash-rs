@@ -1,6 +1,9 @@
+use std::{
+    io::{BufWriter, Write},
+    process::{Command, Stdio},
+};
+
 use crate::Result;
-use eip712_enc::{EIP712, hash_structured_data};
-use serde_json::from_str;
 
 pub struct Eip712Hasher {
     typed_message_string: String,
@@ -12,10 +15,25 @@ impl Eip712Hasher {
     }
 
     pub fn hash(&self) -> Result<String> {
-        let hased_data = hash_structured_data(from_str::<EIP712>(&self.typed_message_string)?)
-            .map_err(|_| "Failed to hash".to_string())?;
-        let hashed_string = &format!("{:x}", hased_data)[..];
-        Ok(hashed_string.to_owned())
+        let mut cmd = Command::new("ts-eel/dist/ts-eel");
+        cmd.stdin(Stdio::piped()).stderr(Stdio::piped()).stdout(Stdio::piped());
+
+        let mut child = cmd.spawn()?;
+
+        {
+            let mut stdin = BufWriter::new(child.stdin.take().unwrap());
+            writeln!(&mut stdin, "{}", &self.typed_message_string)?;
+            stdin.flush()?;
+        }
+
+        let output = child.wait_with_output()?;
+
+        if !output.status.success() {
+            return Err(String::from_utf8_lossy(output.stderr.as_ref()).into());
+        }
+
+        let output_str = String::from_utf8_lossy(output.stdout.as_ref());
+        Ok(output_str.to_string())
     }
 }
 
