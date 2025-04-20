@@ -1,2 +1,4 @@
 /target
 .env
+.DS_STore
+/ts-eel/dist/
