@@ -9,8 +9,10 @@ list=(
 
 for item in "${list[@]}"; do
     deno compile --allow-all --output ts-eel/assets/"${item}" --target $item ts-eel/main.ts
-    tar -czvf "ts-eel/assets/ts-eel-${item}.tar.gz" "ts-eel/assets/$item"
-    rm "ts-eel/assets/$item"
+    pushd ts-eel/assets/
+    tar -czvf "ts-eel-${item}.tar.gz" "$item"
+    rm "$item"
+    popd
 done
 
 open ts-eel/assets/
