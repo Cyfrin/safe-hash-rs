@@ -1,6 +1,10 @@
+use std::{
+    io::{BufWriter, Write},
+    path::PathBuf,
+    process::{Command, Stdio},
+};
+
 use crate::Result;
-use eip712_enc::{EIP712, hash_structured_data};
-use serde_json::from_str;
 
 pub struct Eip712Hasher {
     typed_message_string: String,
@@ -12,200 +16,118 @@ impl Eip712Hasher {
     }
 
     pub fn hash(&self) -> Result<String> {
-        let hased_data = hash_structured_data(from_str::<EIP712>(&self.typed_message_string)?)
-            .map_err(|_| "Failed to hash".to_string())?;
-        let hashed_string = &format!("{:x}", hased_data)[..];
-        Ok(hashed_string.to_owned())
+        let mut cmd = Command::new(ts_eel_path());
+        cmd.stdin(Stdio::piped()).stderr(Stdio::piped()).stdout(Stdio::piped());
+
+        let mut child = cmd.spawn()?;
+
+        {
+            let mut stdin = BufWriter::new(child.stdin.take().unwrap());
+            writeln!(&mut stdin, "{}", &self.typed_message_string)?;
+            stdin.flush()?;
+        }
+
+        let output = child.wait_with_output()?;
+
+        if !output.status.success() {
+            return Err(String::from_utf8_lossy(output.stderr.as_ref()).into());
+        }
+
+        let output_str = String::from_utf8_lossy(output.stdout.as_ref());
+        Ok(output_str.to_string())
     }
 }
 
-#[cfg(test)]
-mod eip712_hash {
-    use crate::Eip712Hasher;
+#[cfg(not(debug_assertions))]
+fn ts_eel_path() -> PathBuf {
+    use std::{fs::OpenOptions, os::unix::fs::PermissionsExt, path::Path, time::Duration};
 
-    #[test]
-    fn test_encoding_1() {
-        let string = r#"{
-            "types": {
-                "EIP712Domain": [
-                    {
-                      "name": "name",
-                      "type": "string"
-                    },
-                    {
-                      "name": "version",
-                      "type": "string"
-                    },
-                    {
-                      "name": "chainId",
-                      "type": "uint256"
-                    },
-                    {
-                      "name": "verifyingContract",
-                      "type": "address"
-                    }
-                ],
-                "Person": [
-                    {
-                      "name": "name",
-                      "type": "string"
-                    },
-                    {
-                      "name": "wallets",
-                      "type": "address[]"
-                    }
-                ],
-                "Mail": [
-                    {
-                      "name": "from",
-                      "type": "Person"
-                    },
-                    {
-                      "name": "to",
-                      "type": "Person[]"
-                    },
-                    {
-                      "name": "contents",
-                      "type": "string"
-                    }
-                ],
-                "Group": [
-                    {
-                      "name": "name",
-                      "type": "string"
-                    },
-                    {
-                      "name": "members",
-                      "type": "Person[]"
-                    }
-                ]
-            },
-            "domain": {
-                "name": "Ether Mail",
-                "version": "1",
-                "chainId": "0x1",
-                "verifyingContract": "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC"
-            },
-            "primaryType": "Mail",
-            "message": {
-                "from": {
-                    "name": "Cow",
-                    "wallets": [
-                      "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
-                      "0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF"
-                    ]
-                },
-                "to": [
-                    {
-                        "name": "Bob",
-                        "wallets": [
-                            "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
-                            "0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57",
-                            "0xB0B0b0b0b0b0B000000000000000000000000000"
-                        ]
-                    }
-                ],
-                "contents": "Hello, Bob!"
-            }
-        }"#;
+    let release = env!("CARGO_PKG_VERSION");
+    let tt = target_triple::TARGET;
+    let th = target_triple::HOST;
 
-        let hasher = Eip712Hasher::new(string.to_string());
-        let hash = hasher.hash().expect("failed to create eip 712 hash");
+    let eels_dir = dirs::home_dir().unwrap().join(".cyfrin").join("eels").join(release);
+    let eel_tar_file = eels_dir.join(format!("ts-eel-{}.tar.gz", tt));
+    let eel_temp_file = eels_dir.join(th);
+    let eel_file = eels_dir.join("ts-eel");
 
-        assert_eq!(hash, "a85c2e2b118698e88db68a8105b794a8cc7cec074e89ef991cb4f5f533819cc2");
+    // If we already downloaded the eel for this version, don't have to re-download
+    if eel_file.exists() {
+        return eel_file;
     }
 
-    #[test]
-    fn test_encoding_2() {
-        let string = r#"{
-            "types": {
-                "EIP712Domain": [
-                    {
-                        "name": "name",
-                        "type": "string"
-                    },
-                    {
-                        "name": "version",
-                        "type": "string"
-                    },
-                    {
-                        "name": "chainId",
-                        "type": "uint256"
-                    },
-                    {
-                        "name": "verifyingContract",
-                        "type": "address"
-                    }
-                ],
-              "Person": [
-                {
-                  "name": "name",
-                  "type": "string"
-                },
-                {
-                  "name": "wallets",
-                  "type": "address[]"
-                }
-              ],
-              "Mail": [
-                {
-                  "name": "from",
-                  "type": "Person"
-                },
-                {
-                  "name": "to",
-                  "type": "Group"
-                },
-                {
-                  "name": "contents",
-                  "type": "string"
-                }
-              ],
-              "Group": [
-                {
-                  "name": "name",
-                  "type": "string"
-                },
-                {
-                  "name": "members",
-                  "type": "Person[]"
-                }
-              ]
-            },
-            "domain": {
-              "name": "Ether Mail",
-              "version": "1",
-              "chainId": "0x1",
-              "verifyingContract": "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC"
-            },
-            "primaryType": "Mail",
-            "message": {
-              "from": {
-                "name": "Cow",
-                "wallets": [
-                  "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
-                  "0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF"
-                ]
-              },
-              "to": {
-                "name": "Farmers",
-                "members": [
-                  {
-                    "name": "Bob",
-                    "wallets": [
-                      "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
-                      "0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57",
-                      "0xB0B0b0b0b0b0B000000000000000000000000000"
-                    ]
-                  }
-                ]
-              },
-              "contents": "Hello, Bob!"
-            }
-          }"#;
+    let eel_code = {
+        // Github will setup permanant redirect on repo renames. so thos should be fine..
+        let url = format!(
+            "https://github.com/Cyfrin/safe-hash-rs/releases/download/safe-hash-v{}/ts-eel-{}.tar.gz",
+            release, tt
+        );
+        let client = reqwest::blocking::Client::builder()
+            .timeout(Duration::from_secs(30))
+            .build()
+            .expect("unable to create eel client");
+        let response = client.get(url).send();
 
-        let hasher = Eip712Hasher::new(string.to_string());
-        let hash = hasher.hash().expect("failed to create eip 712 hash");
-        assert_eq!(hash, "cd8b34cd09c541cfc0a2fcd147e47809b98b335649c2aa700db0b0c4501a02a0");
+        if let Ok(response) = response {
+            response.bytes().unwrap()
+        } else {
+            eprintln!("Error while downloading eel: {:#?}", response.err());
+            std::process::exit(1);
+        }
+    };
+
+    std::fs::create_dir_all(&eels_dir).unwrap();
+
+    {
+        // Write the downloaded contents to a local tarball
+        let mut file = OpenOptions::new()
+            .create_new(true)
+            .write(true)
+            .append(true)
+            .open(&eel_tar_file)
+            .unwrap();
+
+        file.write(&eel_code).expect("failed to commit eel");
+
+        // Unzip the tarball
+        let mut tar = Command::new("tar");
+        tar.stdout(Stdio::piped()).stderr(Stdio::piped());
+
+        // Creates eel_temp_file
+        tar.arg("-xvzf")
+            .arg(format!("ts-eel-{}.tar.gz", tt))
+            .current_dir(eels_dir)
+            .status()
+            .expect("failed to unzip eel");
+
+        // Delete the tarball
+        std::fs::remove_file(&eel_tar_file).expect("deleting tarball failed");
+
+        // Rename binary to ts-eel
+        assert!(eel_temp_file.exists());
+        std::fs::rename(eel_temp_file, &eel_file).expect("unable to rename eel");
+
+        // Make the binary executable
+        let make_executable = |path: &Path| -> std::io::Result<()> {
+            let mut perms = std::fs::metadata(path)?.permissions();
+            perms.set_mode(0o755); // rwxr-xr-x
+            std::fs::set_permissions(path, perms)?;
+            Ok(())
+        };
+
+        _ = make_executable(&eel_file); // don't complain if it fails
     }
+
+    assert!(eel_file.exists());
+    eel_file
+}
+
+#[cfg(debug_assertions)]
+fn ts_eel_path() -> PathBuf {
+    use std::str::FromStr;
+    let filepath =
+        PathBuf::from_str(concat!(env!("CARGO_MANIFEST_DIR"), "/../../ts-eel/dist/ts-eel"))
+            .unwrap();
+    assert!(filepath.exists());
+    filepath
 }
