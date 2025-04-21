@@ -125,5 +125,9 @@ fn ts_eel_path() -> PathBuf {
 #[cfg(debug_assertions)]
 fn ts_eel_path() -> PathBuf {
     use std::str::FromStr;
-    PathBuf::from_str(concat!("ts-eel/dist/ts-eel")).expect("build failed")
+    let filepath =
+        PathBuf::from_str(concat!(env!("CARGO_MANIFEST_DIR"), "/../../ts-eel/dist/ts-eel"))
+            .unwrap();
+    assert!(filepath.exists());
+    filepath
 }

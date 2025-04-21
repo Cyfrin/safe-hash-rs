@@ -133,7 +133,7 @@ fn main() {
 #[cfg(test)]
 mod tests {
 
-    use std::process::Command;
+    use std::{env, process::Command};
 
     #[test]
     fn test_safe_hash_tx_signing_cli_output() {
@@ -229,7 +229,7 @@ mod tests {
             .arg("--")
             .arg("typed")
             .arg("--file")
-            .arg("../../test/eip712_message.json")
+            .arg("../../test/pat_eip712_message.json")
             .output()
             .expect("Failed to execute command");
 
@@ -246,7 +246,7 @@ mod tests {
         // Check for essential content without formatting
         // Check for hash
         assert!(
-            stdout.contains("a85c2e2b118698e88db68a8105b794a8cc7cec074e89ef991cb4f5f533819cc2")
+            stdout.contains("0x76ea36b85e6de361baa7cb21a064a2a985bd2ce751407345d408cee923e94a41")
         );
     }
 }
