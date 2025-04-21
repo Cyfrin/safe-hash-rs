@@ -24,11 +24,3 @@ publish-jobs = ["homebrew", "npm"]
 
 [dist.github-custom-runners]
 global = "ubuntu-latest"
-
-[dist.github-custom-runners.x86_64-unknown-linux-gnu]
-runner = "ubuntu-latest"
-container = { image = "denoland/deno" }
-
-[dist.github-custom-runners.aarch64-unknown-linux-gnu]
-runner = "ubuntu-latest"
-container = { image = "denoland/deno" }
