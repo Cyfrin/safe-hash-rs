@@ -15,7 +15,7 @@ impl Eip712Hasher {
     }
 
     pub fn hash(&self) -> Result<String> {
-        let mut cmd = Command::new("ts-eel/dist/ts-eel");
+        let mut cmd = Command::new(ts_eel_path());
         cmd.stdin(Stdio::piped()).stderr(Stdio::piped()).stdout(Stdio::piped());
 
         let mut child = cmd.spawn()?;
@@ -35,4 +35,14 @@ impl Eip712Hasher {
         let output_str = String::from_utf8_lossy(output.stdout.as_ref());
         Ok(output_str.to_string())
     }
+}
+
+#[cfg(debug_assertions)]
+fn ts_eel_path() -> String {
+    "ts-eel/dist/ts-eel".to_string()
+}
+
+#[cfg(not(debug_assertions))]
+fn ts_eel_path() -> String {
+    "ts-eel/dist/ts-eel".to_string()
 }
