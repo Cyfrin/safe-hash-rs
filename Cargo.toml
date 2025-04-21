@@ -24,10 +24,3 @@ dirs = "6"
 [profile.dist]
 inherits = "release"
 lto = "thin"
-
-[package.metadata.release]
-allow-dirty = true
-
-[package.metadata.dist]
-allow-dirty = true
-
