@@ -27,8 +27,8 @@ global = "ubuntu-latest"
 
 [dist.github-custom-runners.x86_64-unknown-linux-gnu]
 runner = "ubuntu-latest"
-container = { image = "denoland/deno", host = "x86_64-unknown-linux-musl" }
+container = { image = "denoland/deno" }
 
 [dist.github-custom-runners.aarch64-unknown-linux-gnu]
 runner = "ubuntu-latest"
-container = { image = "denoland/deno", host = "x86_64-unknown-linux-musl" }
+container = { image = "denoland/deno" }
