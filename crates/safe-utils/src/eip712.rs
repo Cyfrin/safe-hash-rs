@@ -44,13 +44,11 @@ fn ts_eel_path() -> PathBuf {
 
     let release = env!("CARGO_PKG_VERSION");
     let tt = target_triple::TARGET;
-    let th = target_triple::HOST;
     println!("EEL target {}", tt);
-    println!("EEL host   {}", th);
 
     let eels_dir = dirs::home_dir().unwrap().join(".cyfrin").join("eels").join(release);
     let eel_tar_file = eels_dir.join(format!("ts-eel-{}.tar.gz", tt));
-    let eel_temp_file = eels_dir.join(th);
+    let eel_temp_file = eels_dir.join(tt);
     let eel_file = eels_dir.join("ts-eel");
 
     // If we already downloaded the eel for this version, don't have to re-download
