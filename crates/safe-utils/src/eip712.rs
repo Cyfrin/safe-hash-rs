@@ -45,6 +45,8 @@ fn ts_eel_path() -> PathBuf {
     let release = env!("CARGO_PKG_VERSION");
     let tt = target_triple::TARGET;
     let th = target_triple::HOST;
+    println!("EEL target {}", tt);
+    println!("EEL host   {}", th);
 
     let eels_dir = dirs::home_dir().unwrap().join(".cyfrin").join("eels").join(release);
     let eel_tar_file = eels_dir.join(format!("ts-eel-{}.tar.gz", tt));
@@ -66,6 +68,7 @@ fn ts_eel_path() -> PathBuf {
             .timeout(Duration::from_secs(30))
             .build()
             .expect("unable to create eel client");
+        println!("Downloading eel {}", url);
         let response = client.get(url).send();
 
         if let Ok(response) = response {
@@ -79,13 +82,9 @@ fn ts_eel_path() -> PathBuf {
     std::fs::create_dir_all(&eels_dir).unwrap();
 
     {
+        println!("Writing to tar file {}", eel_tar_file.display());
         // Write the downloaded contents to a local tarball
-        let mut file = OpenOptions::new()
-            .create_new(true)
-            .write(true)
-            .append(true)
-            .open(&eel_tar_file)
-            .unwrap();
+        let mut file = OpenOptions::new().write(true).create_new(true).open(&eel_tar_file).unwrap();
 
         file.write(&eel_code).expect("failed to commit eel");
 
@@ -104,7 +103,7 @@ fn ts_eel_path() -> PathBuf {
         std::fs::remove_file(&eel_tar_file).expect("deleting tarball failed");
 
         // Rename binary to ts-eel
-        assert!(eel_temp_file.exists());
+        println!("Cleaning {}", eel_temp_file.display());
         std::fs::rename(eel_temp_file, &eel_file).expect("unable to rename eel");
 
         // Make the binary executable
