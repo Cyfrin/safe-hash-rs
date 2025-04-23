@@ -1,16 +1,19 @@
 [package]
 name = "safe-utils"
-version = "0.0.3"
+version = "0.0.4"
 edition = "2024"
 publish = false
+repository = "https://github.com/Cyfrin/safe-hash-rs"
+description = "Verify Safe Wallet Transactions and Messages Utils"
+homepage = "Verify Safe Wallet Transactions and Messages Utils"
 
 [dependencies]
 semver.workspace = true
 alloy.workspace = true
 serde_json.workspace = true
-target-triple = "0.1.4"
+target-triple = { workspace = true }
 reqwest.workspace = true
 dirs.workspace = true
 
 [build-dependencies]
-target-triple = "0.1.4"
+target-triple = { workspace = true }
