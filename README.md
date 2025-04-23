@@ -20,12 +20,6 @@ Run `safe-hash --version` to check the installation.
 curl --proto '=https' --tlsv1.2 -LsSf https://github.com/Cyfrin/safe-hash-rs/releases/latest/download/safe-hash-installer.sh | sh
 ```
 
-### Powershell (For Windows)
-
-```
-powershell -ExecutionPolicy Bypass -c "irm https://github.com/Cyfrin/safe-hash-rs/releases/latest/download/safe-hash-installer.ps1 | iex"
-```
-
 ### Homebrew 
 
 ```
