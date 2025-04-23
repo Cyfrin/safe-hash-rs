@@ -15,10 +15,9 @@ jobs:
           toolchain: nightly-2025-01-01
           override: true
 
-      - name: Install Deno
-        run: |
-          curl -fsSL https://deno.land/install.sh | sh
-          echo "/home/runner/.deno/bin/" >> $GITHUB_PATH
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x # Run with latest stable Deno.
 
       - name: Checkout Sources
         uses: actions/checkout@v4
