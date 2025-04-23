@@ -133,7 +133,7 @@ fn main() {
 #[cfg(test)]
 mod tests {
 
-    use std::{env, process::Command};
+    use std::process::Command;
 
     #[test]
     fn test_safe_hash_tx_signing_cli_output() {
