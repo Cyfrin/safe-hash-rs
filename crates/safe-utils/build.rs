@@ -1,7 +1,7 @@
 use std::process::Command;
 
 fn main() {
-    println!("cargo::rerun-if-changed=../../ts-eel,build.rs");
+    println!("cargo::rerun-if-changed=../../ts-eel");
 
     let mut eel_compiler = Command::new("deno");
 
