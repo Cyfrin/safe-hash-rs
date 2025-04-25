@@ -235,6 +235,7 @@ pub fn display_warnings(warnings: &SafeWarnings) {
 pub fn display_eip712_hash(hash: &EIP7127HashDetails) {
     let mut table_rows = Vec::new();
 
+    table_rows.push(vec![cstr!("<green>Raw</>").cell(), "".to_string().cell()]);
     table_rows.push(vec![cstr!("<green>EIP 712 Hash</>").cell(), hash.eip_712_hash.clone().cell()]);
     table_rows.push(vec![cstr!("<green>Domain Hash</>").cell(), hash.domain_hash.clone().cell()]);
     table_rows.push(vec![
@@ -242,6 +243,22 @@ pub fn display_eip712_hash(hash: &EIP7127HashDetails) {
         hash.domain_separator.clone().cell(),
     ]);
     table_rows.push(vec![cstr!("<green>Message Hash</>").cell(), hash.message_hash.clone().cell()]);
+
+    table_rows.push(vec![cstr!("<magenta>Safe</>").cell(), "".to_string().cell()]);
+    table_rows.push(vec![
+        cstr!("<magenta>EIP 712 Hash</>").cell(),
+        hash.safe_eip_712_hash.clone().cell(),
+    ]);
+    table_rows
+        .push(vec![cstr!("<magenta>Domain Hash</>").cell(), hash.safe_domain_hash.clone().cell()]);
+    table_rows.push(vec![
+        cstr!("<magenta>Domain Separator Hash</>").cell(),
+        hash.safe_domain_separator.clone().cell(),
+    ]);
+    table_rows.push(vec![
+        cstr!("<magenta>Message Hash</>").cell(),
+        hash.safe_message_hash.clone().cell(),
+    ]);
 
     let table = table_rows.table().bold(true);
 
