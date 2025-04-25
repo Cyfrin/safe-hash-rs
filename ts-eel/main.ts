@@ -1,4 +1,4 @@
-import { hashTypedData } from "viem";
+import { hashTypedData, domainSeparator, hashStruct } from "viem";
 
 if (import.meta.main) {
   let content = "";
@@ -9,5 +9,19 @@ if (import.meta.main) {
     content += text;
   }
 
-  console.log(hashTypedData(JSON.parse(content)));
+  const jsonIn = JSON.parse(content);
+
+  const result = {
+    eip712Hash: hashTypedData(jsonIn),
+    domainSeparator: domainSeparator({
+      domain: jsonIn.domain,
+    }),
+    messageHash: hashStruct({
+      data: jsonIn.message,
+      primaryType: jsonIn.primaryType,
+      types: jsonIn.types,
+    }),
+  };
+
+  console.log(JSON.stringify(result));
 }

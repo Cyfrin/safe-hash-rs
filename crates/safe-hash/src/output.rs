@@ -1,6 +1,7 @@
 use alloy::{hex, primitives::FixedBytes};
 use cli_table::{Cell, Style, Table};
 use color_print::{cprintln, cstr};
+use safe_utils::EIP7127HashDetails;
 
 pub struct SafeHashes {
     pub raw_message_hash: Option<FixedBytes<32>>,
@@ -231,10 +232,15 @@ pub fn display_warnings(warnings: &SafeWarnings) {
     }
 }
 
-pub fn display_eip712_hash(hash: &String) {
+pub fn display_eip712_hash(hash: &EIP7127HashDetails) {
     let mut table_rows = Vec::new();
 
-    table_rows.push(vec![cstr!("<green>EIP 712 Hash</>").cell(), hash.cell()]);
+    table_rows.push(vec![cstr!("<green>EIP 712 Hash</>").cell(), hash.eip_712_hash.clone().cell()]);
+    table_rows.push(vec![
+        cstr!("<green>Domain Separator Hash</>").cell(),
+        hash.domain_separator.clone().cell(),
+    ]);
+    table_rows.push(vec![cstr!("<green>Message Hash</>").cell(), hash.message_hash.clone().cell()]);
 
     let table = table_rows.table().bold(true);
 

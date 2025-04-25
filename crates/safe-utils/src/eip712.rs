@@ -4,10 +4,21 @@ use std::{
     process::{Command, Stdio},
 };
 
+use serde::Deserialize;
+
 use crate::Result;
 
 pub struct Eip712Hasher {
     typed_message_string: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct EIP7127HashDetails {
+    pub eip_712_hash: String,
+    pub domain_separator: String,
+    pub message_hash: String,
 }
 
 impl Eip712Hasher {
@@ -15,7 +26,7 @@ impl Eip712Hasher {
         Self { typed_message_string }
     }
 
-    pub fn hash(&self) -> Result<String> {
+    pub fn hash(&self) -> Result<EIP7127HashDetails> {
         let mut cmd = Command::new(ts_eel_path());
         cmd.stdin(Stdio::piped()).stderr(Stdio::piped()).stdout(Stdio::piped());
 
@@ -34,7 +45,8 @@ impl Eip712Hasher {
         }
 
         let output_str = String::from_utf8_lossy(output.stdout.as_ref());
-        Ok(output_str.to_string())
+        let eip_712_details: EIP7127HashDetails = serde_json::from_str(&output_str)?;
+        Ok(eip_712_details)
     }
 }
 
@@ -44,7 +56,6 @@ fn ts_eel_path() -> PathBuf {
 
     let release = env!("CARGO_PKG_VERSION");
     let tt = target_triple::TARGET;
-    println!("EEL target {}", tt);
 
     let eels_dir = dirs::home_dir().unwrap().join(".cyfrin").join("eels").join(release);
     let eel_tar_file = eels_dir.join(format!("ts-eel-{}.tar.gz", tt));

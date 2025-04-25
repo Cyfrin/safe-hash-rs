@@ -1,0 +1,28 @@
+{
+    "types": {
+        "SafeMessage": [
+            {
+                "name": "message",
+                "type": "bytes"
+            }
+        ],
+        "EIP712Domain": [
+            {
+                "name": "chainId",
+                "type": "uint256"
+            },
+            {
+                "name": "verifyingContract",
+                "type": "address"
+            }
+        ]
+    },
+    "domain": {
+        "chainId": "0x1",
+        "verifyingContract": "0x35ea56fd9ead2567f339eb9564b6940b9dd5653f"
+    },
+    "primaryType": "SafeMessage",
+    "message": {
+        "message": "0x1be8e5ff60e3a11c229dd65f64fcead922ed2e56991362d76f5df5a8e7d4c1c0"
+    }
+}
