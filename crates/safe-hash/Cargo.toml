@@ -1,6 +1,6 @@
 [package]
 name = "safe-hash"
-version = "0.0.5"
+version = "0.0.6"
 edition = "2024"
 default-run = "safe-hash"
 repository = "https://github.com/Cyfrin/safe-hash-rs"
