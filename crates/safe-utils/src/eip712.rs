@@ -18,12 +18,7 @@ pub struct Eip712Hasher {
 pub struct EIP7127HashDetails {
     pub eip_712_hash: String,
     pub domain_hash: String,
-    pub domain_separator: String,
     pub message_hash: String,
-    pub safe_eip_712_hash: String,
-    pub safe_domain_hash: String,
-    pub safe_domain_separator: String,
-    pub safe_message_hash: String,
 }
 
 impl Eip712Hasher {
