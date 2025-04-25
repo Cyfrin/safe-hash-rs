@@ -1,4 +1,5 @@
 import { hashTypedData, domainSeparator, hashStruct } from "viem";
+import { TypedDataEncoder } from "ethers";
 
 if (import.meta.main) {
   let content = "";
@@ -21,6 +22,7 @@ if (import.meta.main) {
       primaryType: jsonIn.primaryType,
       types: jsonIn.types,
     }),
+    domainHash: TypedDataEncoder.hashDomain(jsonIn.domain),
   };
 
   console.log(JSON.stringify(result));

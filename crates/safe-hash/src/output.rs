@@ -236,6 +236,7 @@ pub fn display_eip712_hash(hash: &EIP7127HashDetails) {
     let mut table_rows = Vec::new();
 
     table_rows.push(vec![cstr!("<green>EIP 712 Hash</>").cell(), hash.eip_712_hash.clone().cell()]);
+    table_rows.push(vec![cstr!("<green>Domain Hash</>").cell(), hash.domain_hash.clone().cell()]);
     table_rows.push(vec![
         cstr!("<green>Domain Separator Hash</>").cell(),
         hash.domain_separator.clone().cell(),
