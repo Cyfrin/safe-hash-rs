@@ -66,82 +66,31 @@ impl SafeWarnings {
 }
 
 pub fn display_api_transaction_details(tx: &crate::api::SafeTransaction) {
-    let mut table_rows = Vec::new();
+    println!("{:<24} {}", "Safe Address:", tx.safe);
+    println!("{:<24} {}", "To:", tx.to);
+    println!("{:<24} {}", "Value:", tx.value);
+    println!("{:<24} {}", "Data:", tx.data);
+    println!("{:<24} {}", "Operation:", tx.operation);
+    println!("{:<24} {}", "Nonce:", tx.nonce);
 
-    // Add basic transaction details
-    table_rows.push(vec![cstr!("<yellow>Safe Address</>").cell(), tx.safe.to_string().cell()]);
-    table_rows.push(vec![cstr!("<yellow>To</>").cell(), tx.to.to_string().cell()]);
-    table_rows.push(vec![cstr!("<yellow>Value</>").cell(), tx.value.clone().cell()]);
-    table_rows.push(vec![cstr!("<yellow>Data</>").cell(), tx.data.clone().cell()]);
-    table_rows.push(vec![cstr!("<yellow>Operation</>").cell(), tx.operation.to_string().cell()]);
-    table_rows.push(vec![cstr!("<yellow>Nonce</>").cell(), tx.nonce.to_string().cell()]);
+    println!("{:<24} {}", "Safe Tx Gas:", tx.safe_tx_gas);
+    println!("{:<24} {}", "Base Gas:", tx.base_gas);
+    println!("{:<24} {}", "Gas Price:", tx.gas_price);
+    println!("{:<24} {}", "Gas Token:", tx.gas_token);
+    println!("{:<24} {}", "Refund Receiver:", tx.refund_receiver);
 
-    // Add gas details
-    table_rows
-        .push(vec![cstr!("<yellow>Safe Tx Gas</>").cell(), tx.safe_tx_gas.to_string().cell()]);
-    table_rows.push(vec![cstr!("<yellow>Base Gas</>").cell(), tx.base_gas.to_string().cell()]);
-    table_rows.push(vec![cstr!("<yellow>Gas Price</>").cell(), tx.gas_price.clone().cell()]);
-    table_rows.push(vec![cstr!("<yellow>Gas Token</>").cell(), tx.gas_token.to_string().cell()]);
-    table_rows.push(vec![
-        cstr!("<yellow>Refund Receiver</>").cell(),
-        tx.refund_receiver.to_string().cell(),
-    ]);
+    println!("{:<24} {}", "Confirmations Required:", tx.confirmations_required);
+    println!("{:<24} {}", "Confirmations Count:", tx.confirmations.len());
 
-    // Add confirmation details
-    table_rows.push(vec![
-        cstr!("<yellow>Confirmations Required</>").cell(),
-        tx.confirmations_required.to_string().cell(),
-    ]);
-    table_rows.push(vec![
-        cstr!("<yellow>Confirmations Count</>").cell(),
-        tx.confirmations.len().to_string().cell(),
-    ]);
-
-    // Add decoded data if available
     if let Some(decoded) = &tx.data_decoded {
-        // Create parameters table with method and parameters
-        let mut param_rows = Vec::new();
-        param_rows.push(vec![cstr!("<blue>Method</>").cell(), decoded.method.clone().cell()]);
+        println!();
+        println!("Decoded Call:");
+
+        println!("{:<12} {}", "Method:", decoded.method);
 
         for param in &decoded.parameters {
-            param_rows.push(vec![
-                cstr!("<blue>Parameter</>").cell(),
-                format!("{}: {}", param.r#type, param.value).cell(),
-            ]);
+            println!("{:<12} {}: {}", "Parameter:", param.r#type, param.value);
         }
-
-        // Print the main transaction details table
-        let table = table_rows
-            .table()
-            .title(vec![
-                cstr!("<cyan>FIELD</>").cell().bold(true),
-                cstr!("<cyan>VALUE</>").cell().bold(true),
-            ])
-            .bold(true);
-        println!("{}", table.display().unwrap());
-
-        // Print the parameters table if we have any
-        if !param_rows.is_empty() {
-            println!(); // Add spacing between tables
-            let param_table = param_rows
-                .table()
-                .title(vec![
-                    cstr!("<cyan>SELECTOR</>").cell().bold(true),
-                    cstr!("<cyan>VALUE</>").cell().bold(true),
-                ])
-                .bold(true);
-            println!("{}", param_table.display().unwrap());
-        }
-    } else {
-        // If no decoded data, just print the main table
-        let table = table_rows
-            .table()
-            .title(vec![
-                cstr!("<cyan>FIELD</>").cell().bold(true),
-                cstr!("<cyan>VALUE</>").cell().bold(true),
-            ])
-            .bold(true);
-        println!("{}", table.display().unwrap());
     }
 }
 

@@ -1,8 +1,6 @@
-use crate::{
-    cli::TransactionArgs,
-    output::Mismatch,
-};
+use crate::{cli::TransactionArgs, output::Mismatch};
 use alloy::primitives::{Address, FixedBytes, U256, hex};
+use safe_utils::get_safe_api;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -74,17 +72,14 @@ pub struct SafeApiResponse {
     pub results: Vec<SafeTransaction>,
 }
 
-const API_BASE_URL: &str = "https://safe-client.safe.global/v1";
-
 pub fn get_safe_transaction(
     chain_id: u64,
     safe_address: Address,
     nonce: u64,
 ) -> Result<SafeTransaction, Box<dyn std::error::Error>> {
-    let url = format!(
-        "{}/chains/{}/safes/{}/multisig-transactions/raw?nonce={}",
-        API_BASE_URL, chain_id, safe_address, nonce
-    );
+    let api_url = get_safe_api(chain_id)?;
+    let url =
+        format!("{}/api/v1/safes/{}/multisig-transactions/?nonce={}", api_url, safe_address, nonce);
     println!("Fetching transaction from API: {}", url);
     let response = reqwest::blocking::get(&url)?;
     let api_response: SafeApiResponse = response.json()?;
@@ -162,7 +157,9 @@ pub fn validate_transaction_details(
         });
     }
 
-    if user_args.refund_receiver != Address::ZERO && user_args.refund_receiver != api_tx.refund_receiver {
+    if user_args.refund_receiver != Address::ZERO
+        && user_args.refund_receiver != api_tx.refund_receiver
+    {
         errors.push(Mismatch {
             field: "refund_receiver".to_string(),
             api_value: api_tx.refund_receiver.to_string(),
@@ -170,7 +167,9 @@ pub fn validate_transaction_details(
         });
     }
 
-    if user_args.safe_tx_gas != U256::ZERO && user_args.safe_tx_gas != U256::from(api_tx.safe_tx_gas) {
+    if user_args.safe_tx_gas != U256::ZERO
+        && user_args.safe_tx_gas != U256::from(api_tx.safe_tx_gas)
+    {
         errors.push(Mismatch {
             field: "safe_tx_gas".to_string(),
             api_value: api_tx.safe_tx_gas.to_string(),
@@ -186,7 +185,9 @@ pub fn validate_transaction_details(
         });
     }
 
-    if user_args.gas_price != U256::ZERO && user_args.gas_price != U256::from_str_radix(&api_tx.gas_price, 10).unwrap_or(U256::ZERO) {
+    if user_args.gas_price != U256::ZERO
+        && user_args.gas_price != U256::from_str_radix(&api_tx.gas_price, 10).unwrap_or(U256::ZERO)
+    {
         errors.push(Mismatch {
             field: "gas_price".to_string(),
             api_value: api_tx.gas_price.clone(),
