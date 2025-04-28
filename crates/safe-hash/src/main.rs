@@ -243,10 +243,49 @@ mod tests {
         let stdout = String::from_utf8_lossy(&output.stdout);
         println!("{}", stdout);
 
-        // Check for essential content without formatting
-        // Check for hash
+        let expected_eip712_hash =
+            "0x76ea36b85e6de361baa7cb21a064a2a985bd2ce751407345d408cee923e94a41";
+        let expected_domain_hash =
+            "0x4b060214423f60c76da4f8d80253b7c6b565786aaae7afef3be4ae257c66761b";
+        let expected_message_hash =
+            "0xdc266ecad0ca5863351fbfa07d82d034df09779408013c1b4b28a2317e5c7909";
+
+        assert!(stdout.contains(expected_eip712_hash));
+        assert!(stdout.contains(expected_domain_hash));
+        assert!(stdout.contains(expected_message_hash));
+    }
+
+    #[test]
+    fn test_eip712_hash_2() {
+        // Run the safe-hash command with some test arguments
+        let output = Command::new("cargo")
+            .arg("run")
+            .arg("--")
+            .arg("typed")
+            .arg("--file")
+            .arg("../../test/another_example.json")
+            .output()
+            .expect("Failed to execute command");
+
+        // Assert that the command executed successfully
         assert!(
-            stdout.contains("0x76ea36b85e6de361baa7cb21a064a2a985bd2ce751407345d408cee923e94a41")
+            output.status.success(),
+            "Command failed: {}",
+            String::from_utf8_lossy(&output.stderr)
         );
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        println!("{}", stdout);
+
+        let expected_eip712_hash =
+            "0x1497354498e270c5ae2652ab217b16deb04c5017635f1f5f229f541998495a6a";
+        let expected_domain_hash =
+            "0x04836bd2dbdcbf68aef3b82e83babee1e988fb3c6fe1e9319d77a125e02a66cd";
+        let expected_message_hash =
+            "0x9b80505023ee7505d826afcf368ef1df4d18e088e773cf51dc5484858be18187";
+
+        assert!(stdout.contains(expected_eip712_hash));
+        assert!(stdout.contains(expected_domain_hash));
+        assert!(stdout.contains(expected_message_hash));
     }
 }
