@@ -135,6 +135,11 @@ pub fn display_hashes(hashes: &SafeHashes) {
     );
 }
 
+pub fn display_full_tx(full_tx_calldata: String, hash: String) {
+    println!("{:<24} {}", "Full Tx Calldata:", full_tx_calldata);
+    println!("{:<24} {}", "Full Tx Calldata Hash:", hash);
+}
+
 pub fn display_warnings(warnings: &SafeWarnings) {
     if warnings.has_warnings() {
         println!(); // Add spacing before warnings

@@ -4,6 +4,8 @@ use alloy::{
     dyn_abi::DynSolValue,
     hex,
     primitives::{Address, B256, ChainId, U256, eip191_hash_message, keccak256},
+    sol,
+    sol_types::SolCall,
 };
 
 pub struct DomainHasher {
@@ -37,6 +39,100 @@ pub struct SafeHasher {
 
 pub struct MessageHasher {
     message: String,
+}
+
+#[derive(Debug)]
+pub struct FullTx {
+    pub to: Address,
+    pub value: U256,
+    pub data: String,
+    pub operation: u8,
+    pub safe_tx_gas: U256,
+    pub base_gas: U256,
+    pub gas_price: U256,
+    pub gas_token: Address,
+    pub refund_receiver: Address,
+    pub nonce: U256,
+    pub signatures: String,
+}
+
+impl FullTx {
+    pub fn new(
+        to: Address,
+        value: U256,
+        data: String,
+        operation: u8,
+        safe_tx_gas: U256,
+        base_gas: U256,
+        gas_price: U256,
+        gas_token: Address,
+        refund_receiver: Address,
+        nonce: U256,
+        signatures: String,
+    ) -> Self {
+        Self {
+            to,
+            value,
+            data,
+            operation,
+            safe_tx_gas,
+            base_gas,
+            gas_price,
+            gas_token,
+            refund_receiver,
+            nonce,
+            signatures,
+        }
+    }
+
+    pub fn calldata(&self) -> String {
+        sol! {
+            function execTransaction(
+                address to,
+                uint256 value,
+                bytes data,
+                uint8 operation,
+                uint256 safe_tx_gas,
+                uint256 base_gas,
+                uint256 gas_price,
+                address gas_token,
+                address refund_receiver,
+                bytes signatures
+            ) external returns (bool success);
+        }
+        //
+        //let strukt = execTransactionCall {
+        //    to: self.to,
+        //    value: self.value,
+        //    data: self.data.clone().into(),
+        //    operation: self.operation,
+        //    safe_tx_gas: self.safe_tx_gas,
+        //    base_gas: self.base_gas,
+        //    gas_price: self.gas_price,
+        //    gas_token: self.gas_token,
+        //    refund_receiver: self.refund_receiver,
+        //    signatures: self.signatures.clone().into(),
+        //};
+
+        let d = DynSolValue::Tuple(vec![
+            DynSolValue::Address(self.to),
+            DynSolValue::Uint(self.value, 256),
+            DynSolValue::String(self.data.clone()),
+            DynSolValue::Uint(U256::from(self.operation), 8),
+            DynSolValue::Uint(self.safe_tx_gas, 256),
+            DynSolValue::Uint(self.base_gas, 256),
+            DynSolValue::Uint(self.gas_price, 256),
+            DynSolValue::Address(self.gas_token),
+            DynSolValue::Address(self.refund_receiver),
+            DynSolValue::String(self.signatures.clone()),
+        ]);
+        hex::encode(d.abi_encode())
+    }
+
+    pub fn calldata_hash(&self) -> Result<String> {
+        let calldata = hex::decode(self.calldata())?;
+        Ok(keccak256(calldata).to_string())
+    }
 }
 
 impl DomainHasher {
