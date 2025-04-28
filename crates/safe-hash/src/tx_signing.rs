@@ -3,8 +3,6 @@ use alloy::primitives::{Address, ChainId, U256};
 use safe_utils::{CallDataHasher, DomainHasher, SafeHasher, SafeWalletVersion, TxMessageHasher};
 use serde::{Deserialize, Serialize};
 
-// Upon simulation (in Tenderly), the Summary section contains input and output json.
-// This module will try to deserialize the input json to have a strongly typed representation.
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TxInput {
