@@ -146,72 +146,40 @@ pub fn display_api_transaction_details(tx: &crate::api::SafeTransaction) {
 }
 
 pub fn display_calldata_decoded(decoded: &CalldataDecoded) {
-    cprintln!("<bold>Brute-force checking function signature of tx data</bold>");
+    println!("Brute-force checking function signature of tx data");
+
     for decoded_unit in &decoded.options {
-        let mut table_rows = Vec::new();
+        let signature = &decoded_unit.signature;
+        let arguments = &decoded_unit.arguments;
 
-        let signature = decoded_unit.signature.clone();
-        let arguments = decoded_unit.arguments.clone();
+        println!("{:<12} {}", "Signature:", signature);
 
-        let first_argument =
-            if arguments.is_empty() { "".to_string() } else { arguments[0].clone() };
+        if let Some(first_argument) = arguments.get(0) {
+            println!("{:<12} {}", "Arguments:", first_argument);
 
-        table_rows.push(vec![cstr!("<green>Signature</>").cell(), signature.cell()]);
-        table_rows.push(vec![cstr!("<green>Arguments</>").cell(), first_argument.cell()]);
-
-        if arguments.len() > 1 {
             for argument in &arguments[1..] {
-                table_rows.push(vec![cstr!("").cell(), argument.cell()]);
+                println!("{:<12} {}", "", argument);
             }
+        } else {
+            println!("{:<12} {}", "Arguments:", "");
         }
-        let table = table_rows
-            .table()
-            .title(vec![
-                cstr!("<cyan>Internal Calldata</>").cell().bold(true),
-                cstr!("").cell().bold(true),
-            ])
-            .bold(true);
 
-        let table_display = table.display().unwrap();
-        println!("{}", table_display);
+        println!(); // add an empty line between different decoded units
     }
 
-    cprintln!(
-        "<bold>If there are multiple signatures, verify the effects on the smart contract for each one by simmulation before making transaction.</bold>"
+    println!(
+        "If there are multiple signatures, verify the effects on the smart contract for each one by simulation before making the transaction."
     );
 }
 
 pub fn display_hashes(hashes: &SafeHashes) {
-    let mut table_rows = Vec::new();
-
-    // Add raw message hash if available
     if let Some(raw_hash) = hashes.raw_message_hash {
-        table_rows
-            .push(vec![cstr!("<green>Raw Message Hash</>").cell(), hex::encode(raw_hash).cell()]);
+        println!("{:<24} {}", "Raw Message Hash:", hex::encode(raw_hash));
     }
 
-    // Add the standard hashes
-    table_rows
-        .push(vec![cstr!("<green>Domain Hash</>").cell(), hex::encode(hashes.domain_hash).cell()]);
-    table_rows.push(vec![
-        cstr!("<green>Message Hash</>").cell(),
-        hex::encode(hashes.message_hash).cell(),
-    ]);
-    table_rows.push(vec![
-        cstr!("<green>Safe Transaction Hash</>").cell(),
-        hex::encode(hashes.safe_tx_hash).cell(),
-    ]);
-
-    let table = table_rows
-        .table()
-        .title(vec![
-            cstr!("<cyan>HASH TYPE</>").cell().bold(true),
-            cstr!("<cyan>CALCULATED HASHES</cyan>").cell().bold(true),
-        ])
-        .bold(true);
-
-    let table_display = table.display().unwrap();
-    println!("{}", table_display);
+    println!("{:<24} {}", "Domain Hash:", hex::encode(hashes.domain_hash));
+    println!("{:<24} {}", "Message Hash:", hex::encode(hashes.message_hash));
+    println!("{:<24} {}", "Safe Transaction Hash:", hex::encode(hashes.safe_tx_hash));
 
     cprintln!(
         "<bold>Verify the above value as the Safe Tx Hash when signing the message from the ledger.</bold>"
