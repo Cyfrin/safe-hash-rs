@@ -15,9 +15,9 @@ use cli::{CliArgs, Mode};
 use msg_signing::*;
 use output::{
     SafeWarnings, display_api_transaction_details, display_calldata_decoded, display_eip712_hash,
-    display_hashes, display_warnings,
+    display_full_tx, display_hashes, display_warnings,
 };
-use safe_utils::{CalldataDecoder, Eip712Hasher, Of};
+use safe_utils::{CalldataDecoder, Eip712Hasher, FullTx, Of};
 use std::fs;
 use tx_signing::*;
 use warn::check_suspicious_content;
@@ -93,6 +93,22 @@ fn main() {
                 )
             };
 
+            if let Ok(Some(api_tx)) = &api_tx {
+                let full_tx = FullTx::new(
+                    api_tx.to,
+                    U256::from_str_radix(&api_tx.value, 10).unwrap_or(U256::ZERO),
+                    api_tx.data.clone(),
+                    api_tx.operation,
+                    U256::from(api_tx.safe_tx_gas),
+                    U256::from(api_tx.base_gas),
+                    U256::from_str_radix(&api_tx.gas_price, 10).unwrap_or(U256::ZERO),
+                    api_tx.gas_token,
+                    api_tx.refund_receiver,
+                    U256::from(api_tx.nonce),
+                    api_tx.signatures.clone(),
+                );
+                display_full_tx(full_tx.calldata(), full_tx.calldata_hash().unwrap_or_default());
+            }
             // Calculate hashes
             let hashes = tx_signing_hashes(
                 &tx_data,
