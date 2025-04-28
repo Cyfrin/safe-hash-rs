@@ -78,6 +78,9 @@ pub struct TransactionArgs {
 
     #[arg(long, default_value_t = Address::ZERO)]
     pub refund_receiver: Address,
+
+    #[arg(long)]
+    pub offline: bool,
 }
 
 impl Default for TransactionArgs {
@@ -96,6 +99,7 @@ impl Default for TransactionArgs {
             safe_address: Address::ZERO,
             chain: "ethereum".to_string(),
             safe_version: Version::new(1, 3, 0),
+            offline: false,
         }
     }
 }
