@@ -100,33 +100,21 @@ impl FullTx {
                 bytes signatures
             ) external returns (bool success);
         }
-        //
-        //let strukt = execTransactionCall {
-        //    to: self.to,
-        //    value: self.value,
-        //    data: self.data.clone().into(),
-        //    operation: self.operation,
-        //    safe_tx_gas: self.safe_tx_gas,
-        //    base_gas: self.base_gas,
-        //    gas_price: self.gas_price,
-        //    gas_token: self.gas_token,
-        //    refund_receiver: self.refund_receiver,
-        //    signatures: self.signatures.clone().into(),
-        //};
 
-        let d = DynSolValue::Tuple(vec![
-            DynSolValue::Address(self.to),
-            DynSolValue::Uint(self.value, 256),
-            DynSolValue::String(self.data.clone()),
-            DynSolValue::Uint(U256::from(self.operation), 8),
-            DynSolValue::Uint(self.safe_tx_gas, 256),
-            DynSolValue::Uint(self.base_gas, 256),
-            DynSolValue::Uint(self.gas_price, 256),
-            DynSolValue::Address(self.gas_token),
-            DynSolValue::Address(self.refund_receiver),
-            DynSolValue::String(self.signatures.clone()),
-        ]);
-        hex::encode(d.abi_encode())
+        let strukt = execTransactionCall {
+            to: self.to,
+            value: self.value,
+            data: hex::decode(self.data.clone()).unwrap().into(),
+            operation: self.operation,
+            safe_tx_gas: self.safe_tx_gas,
+            base_gas: self.base_gas,
+            gas_price: self.gas_price,
+            gas_token: self.gas_token,
+            refund_receiver: self.refund_receiver,
+            signatures: hex::decode(self.signatures.clone()).unwrap().into(),
+        };
+
+        hex::encode(strukt.abi_encode())
     }
 
     pub fn calldata_hash(&self) -> Result<String> {
