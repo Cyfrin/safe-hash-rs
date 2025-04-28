@@ -127,6 +127,7 @@ mod tests {
             gas_price: U256::ZERO,
             gas_token: Address::ZERO,
             refund_receiver: Address::ZERO,
+            offline: false,
         };
 
         let tx_data = TxInput::new(

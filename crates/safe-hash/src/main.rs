@@ -31,21 +31,25 @@ fn main() {
             });
 
             // Try to get transaction details from API
-            let api_tx = match api::get_safe_transaction(
-                chain_id,
-                tx_args.safe_address,
-                tx_args.nonce as u64,
-            ) {
-                Ok(tx) => Some(tx),
-                Err(e) => {
-                    eprintln!("Warning: Could not fetch transaction from API: {}", e);
-                    eprintln!("Falling back to offline mode with provided parameters");
-                    None
+            let api_tx = if tx_args.offline {
+                Ok(None)
+            } else {
+                match api::get_safe_transaction(
+                    chain_id,
+                    tx_args.safe_address,
+                    tx_args.nonce as u64,
+                ) {
+                    Ok(tx) => Ok(Some(tx)),
+                    Err(e) => {
+                        eprintln!("Warning: Could not fetch transaction from API: {}", e);
+                        eprintln!("Falling back to offline mode with provided parameters");
+                        Err(e)
+                    }
                 }
             };
 
             let mut warnings = SafeWarnings::new();
-            let tx_data = if let Some(api_tx) = &api_tx {
+            let tx_data = if let Ok(Some(api_tx)) = &api_tx {
                 // Display API transaction details
                 display_api_transaction_details(api_tx);
 
@@ -94,7 +98,7 @@ fn main() {
                 tx_signing_hashes(&tx_data, &tx_args, chain_id, tx_args.safe_version.clone());
 
             // Validate Safe Transaction Hash against API data if available
-            if let Some(api_tx) = &api_tx {
+            if let Ok(Some(api_tx)) = &api_tx {
                 if let Err(e) = api::validate_safe_tx_hash(api_tx, &hashes.safe_tx_hash) {
                     warnings.argument_mismatches.push(e);
                 }
