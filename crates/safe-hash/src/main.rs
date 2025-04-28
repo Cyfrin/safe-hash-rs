@@ -6,7 +6,10 @@ mod output;
 mod tx_signing;
 mod warn;
 
-use alloy::primitives::{ChainId, U256};
+use alloy::{
+    hex,
+    primitives::{Address, ChainId, U256},
+};
 use clap::Parser;
 use cli::{CliArgs, Mode};
 use msg_signing::*;
@@ -99,6 +102,26 @@ fn main() {
                 tx_args.safe_version.clone(),
             );
 
+            let nested_tx_data: Option<TxInput> =
+                match (tx_args.nested_safe_address, tx_args.nested_safe_nonce) {
+                    (Some(nested_safe_address), Some(_)) => {
+                        let data = format!("0xd4d9bdcd{}", hex::encode(hashes.safe_tx_hash));
+                        Some(TxInput::new(
+                            nested_safe_address,
+                            U256::ZERO,
+                            data,
+                            0,
+                            U256::ZERO,
+                            U256::ZERO,
+                            U256::ZERO,
+                            Address::ZERO,
+                            Address::ZERO,
+                            String::new(),
+                        ))
+                    }
+                    (_, _) => None,
+                };
+
             // Validate Safe Transaction Hash against API data if available
             if let Ok(Some(api_tx)) = &api_tx {
                 // Display API transaction details
@@ -113,7 +136,22 @@ fn main() {
             warnings.union(check_suspicious_content(&tx_data, Some(chain_id)));
 
             // Display hashes
+            println!("\n\nMain transaction");
             display_hashes(&hashes);
+
+            // Calculate nested hashes
+            if let Some(nested_tx_data) = nested_tx_data {
+                let nhashes = tx_signing_hashes(
+                    &nested_tx_data,
+                    tx_args.nested_safe_address.expect("--nested-safe-address not provided"),
+                    tx_args.nested_safe_nonce.expect("--nested-safe-none not provided"),
+                    chain_id,
+                    tx_args.safe_version.clone(),
+                );
+
+                println!("\n\nNested transaction");
+                display_hashes(&nhashes);
+            }
 
             // Predict ABI decode string
             let calldata_decoder = CalldataDecoder::new(tx_data.data.clone());

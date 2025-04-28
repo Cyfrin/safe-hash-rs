@@ -64,6 +64,14 @@ pub struct TransactionArgs {
     #[arg(long, default_value_t = 0)]
     pub operation: u8,
 
+    /// Nested safe address
+    #[arg(long)]
+    pub nested_safe_address: Option<Address>,
+
+    /// Nested safe nonce
+    #[arg(long)]
+    pub nested_safe_nonce: Option<u8>,
+
     #[arg(long, default_value_t = U256::ZERO)]
     pub safe_tx_gas: U256,
 
@@ -99,6 +107,8 @@ impl Default for TransactionArgs {
             safe_address: Address::ZERO,
             chain: "ethereum".to_string(),
             safe_version: Version::new(1, 3, 0),
+            nested_safe_address: None,
+            nested_safe_nonce: None,
             offline: false,
         }
     }
