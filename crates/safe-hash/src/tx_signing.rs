@@ -101,8 +101,6 @@ pub fn tx_signing_hashes(
 
 #[cfg(test)]
 mod tests {
-    use crate::cli::TransactionArgs;
-
     use super::*;
     use alloy::primitives::{Address, ChainId, FixedBytes, U256, address, hex};
     use safe_utils::{Of, SafeWalletVersion};
@@ -112,26 +110,11 @@ mod tests {
     fn test_tx_signing_hashes() {
         // Create test inputs
         let safe_address = Address::from_str("0x1c694Fc3006D81ff4a56F97E1b99529066a23725").unwrap();
-        let to_address = Address::from_str("0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48").unwrap();
         let nonce = 63;
-        let data = "0xa9059cbb00000000000000000000000092d0ebaf7eb707f0650f9471e61348f4656c29bc00000000000000000000000000000000000000000000000000000005d21dba00".to_string();
+        let safe_version = SafeWalletVersion::new(1, 3, 0);
 
-        let args = TransactionArgs {
-            chain: "ethereum".to_string(),
-            nonce,
-            safe_address,
-            safe_version: SafeWalletVersion::new(1, 3, 0),
-            to: Some(to_address),
-            value: U256::ZERO,
-            data: data.clone(),
-            operation: 0,
-            safe_tx_gas: U256::ZERO,
-            base_gas: U256::ZERO,
-            gas_price: U256::ZERO,
-            gas_token: Address::ZERO,
-            refund_receiver: Address::ZERO,
-            offline: false,
-        };
+        let to_address = Address::from_str("0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48").unwrap();
+        let data = "0xa9059cbb00000000000000000000000092d0ebaf7eb707f0650f9471e61348f4656c29bc00000000000000000000000000000000000000000000000000000005d21dba00".to_string();
 
         let tx_data = TxInput::new(
             to_address,
@@ -147,13 +130,8 @@ mod tests {
         );
 
         let chain_id = ChainId::of("ethereum").unwrap();
-        let hashes = tx_signing_hashes(
-            &tx_data,
-            args.safe_address,
-            args.nonce,
-            chain_id,
-            args.safe_version.clone(),
-        );
+        let hashes =
+            tx_signing_hashes(&tx_data, safe_address, nonce, chain_id, safe_version.clone());
 
         // Expected outputs
         let expected_domain = FixedBytes::new(
