@@ -1,7 +1,7 @@
 use alloy::{hex, primitives::FixedBytes};
 use cli_table::{Cell, Style, Table};
 use color_print::{cprintln, cstr};
-use safe_utils::EIP7127HashDetails;
+use safe_utils::{CalldataDecoded, EIP7127HashDetails};
 
 pub struct SafeHashes {
     pub raw_message_hash: Option<FixedBytes<32>>,
@@ -139,6 +139,42 @@ pub fn display_api_transaction_details(tx: &crate::api::SafeTransaction) {
             .bold(true);
         println!("{}", table.display().unwrap());
     }
+}
+
+pub fn display_calldata_decoded(decoded: &CalldataDecoded) {
+    cprintln!("<bold>Brute-force checking function signature of tx data</bold>");
+    for decoded_unit in &decoded.options {
+        let mut table_rows = Vec::new();
+
+        let signature = decoded_unit.signature.clone();
+        let arguments = decoded_unit.arguments.clone();
+
+        let first_argument =
+            if arguments.is_empty() { "".to_string() } else { arguments[0].clone() };
+
+        table_rows.push(vec![cstr!("<green>Signature</>").cell(), signature.cell()]);
+        table_rows.push(vec![cstr!("<green>Arguments</>").cell(), first_argument.cell()]);
+
+        if arguments.len() > 1 {
+            for argument in &arguments[1..] {
+                table_rows.push(vec![cstr!("").cell(), argument.cell()]);
+            }
+        }
+        let table = table_rows
+            .table()
+            .title(vec![
+                cstr!("<cyan>Internal Calldata</>").cell().bold(true),
+                cstr!("").cell().bold(true),
+            ])
+            .bold(true);
+
+        let table_display = table.display().unwrap();
+        println!("{}", table_display);
+    }
+
+    cprintln!(
+        "<bold>If there are multiple signatures, verify the effects on the smart contract for each one by simmulation before making transaction.</bold>"
+    );
 }
 
 pub fn display_hashes(hashes: &SafeHashes) {
