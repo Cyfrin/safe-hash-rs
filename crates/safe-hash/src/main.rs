@@ -50,9 +50,6 @@ fn main() {
 
             let mut warnings = SafeWarnings::new();
             let tx_data = if let Ok(Some(api_tx)) = &api_tx {
-                // Display API transaction details
-                display_api_transaction_details(api_tx);
-
                 // Validate that user-provided details match API data if any were provided
                 if let Err(errors) = api::validate_transaction_details(api_tx, &tx_args) {
                     if !errors.is_empty() {
@@ -94,11 +91,19 @@ fn main() {
             };
 
             // Calculate hashes
-            let hashes =
-                tx_signing_hashes(&tx_data, &tx_args, chain_id, tx_args.safe_version.clone());
+            let hashes = tx_signing_hashes(
+                &tx_data,
+                tx_args.safe_address,
+                tx_args.nonce,
+                chain_id,
+                tx_args.safe_version.clone(),
+            );
 
             // Validate Safe Transaction Hash against API data if available
             if let Ok(Some(api_tx)) = &api_tx {
+                // Display API transaction details
+                display_api_transaction_details(api_tx);
+
                 if let Err(e) = api::validate_safe_tx_hash(api_tx, &hashes.safe_tx_hash) {
                     warnings.argument_mismatches.push(e);
                 }

@@ -1,4 +1,4 @@
-use crate::{cli::TransactionArgs, output::SafeHashes};
+use crate::output::SafeHashes;
 use alloy::primitives::{Address, ChainId, U256};
 use safe_utils::{CallDataHasher, DomainHasher, SafeHasher, SafeWalletVersion, TxMessageHasher};
 use serde::{Deserialize, Serialize};
@@ -59,13 +59,14 @@ impl TxInput {
 
 pub fn tx_signing_hashes(
     tx_data: &TxInput,
-    args: &TransactionArgs,
+    safe_address: Address,
+    nonce: u8,
     chain_id: ChainId,
     safe_version: SafeWalletVersion,
 ) -> SafeHashes {
     // Calculate hashes
     let domain_hash = {
-        let domain_hasher = DomainHasher::new(safe_version.clone(), chain_id, args.safe_address);
+        let domain_hasher = DomainHasher::new(safe_version.clone(), chain_id, safe_address);
         domain_hasher.hash()
     };
 
@@ -85,7 +86,7 @@ pub fn tx_signing_hashes(
             tx_data.gas_price,
             tx_data.gas_token,
             tx_data.refund_receiver,
-            U256::from(args.nonce),
+            U256::from(nonce),
         );
         message_hasher.hash()
     };
@@ -100,6 +101,8 @@ pub fn tx_signing_hashes(
 
 #[cfg(test)]
 mod tests {
+    use crate::cli::TransactionArgs;
+
     use super::*;
     use alloy::primitives::{Address, ChainId, FixedBytes, U256, address, hex};
     use safe_utils::{Of, SafeWalletVersion};
@@ -144,7 +147,13 @@ mod tests {
         );
 
         let chain_id = ChainId::of("ethereum").unwrap();
-        let hashes = tx_signing_hashes(&tx_data, &args, chain_id, args.safe_version.clone());
+        let hashes = tx_signing_hashes(
+            &tx_data,
+            args.safe_address,
+            args.nonce,
+            chain_id,
+            args.safe_version.clone(),
+        );
 
         // Expected outputs
         let expected_domain = FixedBytes::new(

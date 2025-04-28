@@ -46,10 +46,11 @@ fn test_safe_hash_tx_signing_cli_output() {
     // Run the safe-hash command with some test arguments
     let output = Command::new("cargo")
             .arg("run")
-        .arg("-p")
-        .arg("safe-hash")
+            .arg("-p")
+            .arg("safe-hash")
             .arg("--")
             .arg("tx")
+            .arg("--offline")
             .arg("--chain")
             .arg("ethereum")
             .arg("--nonce")
