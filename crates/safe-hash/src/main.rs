@@ -109,6 +109,9 @@ fn main() {
                 }
             }
 
+            // Check for suspicious content and union warnings
+            warnings.union(check_suspicious_content(&tx_data, Some(chain_id)));
+
             // Display hashes
             display_hashes(&hashes);
 
@@ -117,10 +120,18 @@ fn main() {
             if let Ok(decoded) = calldata_decoder.try_decode() {
                 println!();
                 display_calldata_decoded(&decoded);
-            }
 
-            // Check for suspicious content and union warnings
-            warnings.union(check_suspicious_content(&tx_data, Some(chain_id)));
+                let dangerous_methods =
+                    ["addOwnerWithThreshold", "removeOwner", "swapOwner", "changeThreshold"];
+
+                if decoded
+                    .options
+                    .iter()
+                    .any(|option| dangerous_methods.iter().any(|m| option.signature.starts_with(m)))
+                {
+                    warnings.dangerous_methods = true;
+                }
+            }
 
             // Display warnings after the hashes
             display_warnings(&warnings);

@@ -24,6 +24,7 @@ pub struct SafeWarnings {
     pub non_zero_gas_token: bool,
     pub non_zero_refund_receiver: bool,
     pub argument_mismatches: Vec<Mismatch>,
+    pub dangerous_methods: bool,
 }
 
 impl SafeWarnings {
@@ -36,6 +37,7 @@ impl SafeWarnings {
             non_zero_gas_token: false,
             non_zero_refund_receiver: false,
             argument_mismatches: Vec::new(),
+            dangerous_methods: false,
         }
     }
 
@@ -46,6 +48,7 @@ impl SafeWarnings {
             || self.delegatecall
             || self.non_zero_gas_token
             || self.non_zero_refund_receiver
+            || self.dangerous_methods
             || !self.argument_mismatches.is_empty()
     }
 
@@ -57,6 +60,7 @@ impl SafeWarnings {
         self.delegatecall |= other.delegatecall;
         self.non_zero_gas_token |= other.non_zero_gas_token;
         self.non_zero_refund_receiver |= other.non_zero_refund_receiver;
+        self.dangerous_methods |= other.dangerous_methods;
         self.argument_mismatches.extend(other.argument_mismatches);
     }
 }
@@ -238,7 +242,11 @@ pub fn display_warnings(warnings: &SafeWarnings) {
         if warnings.non_zero_refund_receiver {
             cprintln!("• Transaction has a non-zero refund receiver");
         }
-
+        if warnings.dangerous_methods {
+            cprintln!(
+                "• Transaction data matches a function signature that modifies the owners or threshold of the Safe."
+            );
+        }
         // Display argument mismatches prominently
         if !warnings.argument_mismatches.is_empty() {
             cprintln!("<bold><red>🚨 ARGUMENT MISMATCHES:</red></bold>");
