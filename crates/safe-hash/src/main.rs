@@ -11,10 +11,10 @@ use clap::Parser;
 use cli::{CliArgs, Mode};
 use msg_signing::*;
 use output::{
-    SafeWarnings, display_api_transaction_details, display_eip712_hash, display_hashes,
-    display_warnings,
+    SafeWarnings, display_api_transaction_details, display_calldata_decoded, display_eip712_hash,
+    display_hashes, display_warnings,
 };
-use safe_utils::{Eip712Hasher, Of};
+use safe_utils::{CalldataDecoder, Eip712Hasher, Of};
 use std::fs;
 use tx_signing::*;
 use warn::check_suspicious_content;
@@ -111,6 +111,13 @@ fn main() {
 
             // Display hashes
             display_hashes(&hashes);
+
+            // Predict ABI decode string
+            let calldata_decoder = CalldataDecoder::new(tx_data.data.clone());
+            if let Ok(decoded) = calldata_decoder.try_decode() {
+                println!();
+                display_calldata_decoded(&decoded);
+            }
 
             // Check for suspicious content and union warnings
             warnings.union(check_suspicious_content(&tx_data, Some(chain_id)));
