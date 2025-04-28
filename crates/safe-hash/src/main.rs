@@ -136,7 +136,7 @@ fn main() {
             warnings.union(check_suspicious_content(&tx_data, Some(chain_id)));
 
             // Display hashes
-            println!("\n\nMain transaction");
+            println!("\nMain transaction");
             display_hashes(&hashes);
 
             // Calculate nested hashes
@@ -149,7 +149,7 @@ fn main() {
                     tx_args.safe_version.clone(),
                 );
 
-                println!("\n\nNested transaction");
+                println!("\nNested transaction");
                 display_hashes(&nhashes);
             }
 
