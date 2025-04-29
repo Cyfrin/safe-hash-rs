@@ -1,7 +1,7 @@
 use alloy::{hex, primitives::FixedBytes};
 use cli_table::{Cell, Style, Table};
 use color_print::{cprintln, cstr};
-use safe_utils::{CalldataDecoded, EIP7127HashDetails};
+use safe_utils::EIP7127HashDetails;
 
 pub struct SafeHashes {
     pub raw_message_hash: Option<FixedBytes<32>>,
@@ -92,33 +92,6 @@ pub fn display_api_transaction_details(tx: &crate::api::SafeTransaction) {
             println!("{:<12} {}: {}", "Parameter:", param.r#type, param.value);
         }
     }
-}
-
-pub fn display_calldata_decoded(decoded: &CalldataDecoded) {
-    println!("Brute-force checking function signature of tx data");
-
-    for decoded_unit in &decoded.options {
-        let signature = &decoded_unit.signature;
-        let arguments = &decoded_unit.arguments;
-
-        println!("{:<12} {}", "Signature:", signature);
-
-        if let Some(first_argument) = arguments.get(0) {
-            println!("{:<12} {}", "Arguments:", first_argument);
-
-            for argument in &arguments[1..] {
-                println!("{:<12} {}", "", argument);
-            }
-        } else {
-            println!("{:<12} {}", "Arguments:", "");
-        }
-
-        println!(); // add an empty line between different decoded units
-    }
-
-    println!(
-        "If there are multiple signatures, verify the effects on the smart contract for each one by simulation before making the transaction."
-    );
 }
 
 pub fn display_hashes(hashes: &SafeHashes) {
