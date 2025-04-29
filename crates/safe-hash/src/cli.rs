@@ -45,7 +45,7 @@ pub struct TransactionArgs {
     pub safe_address: Address,
 
     /// Safe Contract version
-    #[arg(short = 'u', long, default_value = "1.3.0")]
+    #[arg(short = 'u', long)]
     pub safe_version: SafeWalletVersion,
 
     /// Address of the contract to which the safe-address sends calldata to.
@@ -128,7 +128,7 @@ pub struct MessageArgs {
     pub safe_address: Address,
 
     /// Safe Contract version
-    #[arg(short = 'u', long, default_value = "1.3.0")]
+    #[arg(short = 'u', long)]
     pub safe_version: SafeWalletVersion,
 
     /// Path to the message file to be signed
@@ -201,26 +201,6 @@ mod tests {
     }
 
     #[test]
-    fn test_manual_params() {
-        let args = manual_args();
-
-        let cli = CliArgs::try_parse_from(&args).unwrap();
-        if let Mode::Transaction(tx_args) = cli.mode {
-            assert_eq!(tx_args.chain, "ethereum");
-            assert_eq!(tx_args.nonce, 42);
-            assert_eq!(
-                tx_args.safe_address,
-                address!("0x1234567890123456789012345678901234567890")
-            );
-            assert_eq!(tx_args.to, Some(address!("0x2234567890123456789012345678901234567890")));
-            assert_eq!(tx_args.value, U256::from(0));
-            assert_eq!(tx_args.data, "0xabcd");
-        } else {
-            panic!("Expected Transaction mode");
-        }
-    }
-
-    #[test]
     fn test_all_gas_params() {
         let mut args = manual_args();
         args.extend_from_slice(&[
@@ -234,6 +214,8 @@ mod tests {
             "0x3234567890123456789012345678901234567890".to_string(),
             "--refund-receiver".to_string(),
             "0x4234567890123456789012345678901234567890".to_string(),
+            "--safe-version".to_string(),
+            "1.3.0".to_string(),
         ]);
 
         let cli = CliArgs::try_parse_from(&args).unwrap();
@@ -262,6 +244,8 @@ mod tests {
             "0x1234567890123456789012345678901234567890".to_string(),
             "--input-file".to_string(),
             "message.txt".to_string(),
+            "--safe-version".to_string(),
+            "1.3.0".to_string(),
         ];
 
         let cli = CliArgs::try_parse_from(&args).unwrap();

@@ -61,6 +61,8 @@ fn test_safe_hash_tx_signing_cli_output() {
             .arg("0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48")
             .arg("--data")
             .arg("0xa9059cbb00000000000000000000000092d0ebaf7eb707f0650f9471e61348f4656c29bc00000000000000000000000000000000000000000000000000000005d21dba00")
+            .arg("--safe-version")
+            .arg("1.3.0")
             .output()
             .expect("Failed to execute command");
 
@@ -88,6 +90,8 @@ fn test_safe_hash_msg_signing_cli_output() {
         .arg("safe-hash")
         .arg("--")
         .arg("msg")
+        .arg("--safe-version")
+        .arg("1.3.0")
         .arg("--chain")
         .arg("sepolia")
         .arg("--safe-address")
