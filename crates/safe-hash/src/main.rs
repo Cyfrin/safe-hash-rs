@@ -14,10 +14,10 @@ use clap::Parser;
 use cli::{CliArgs, Mode};
 use msg_signing::*;
 use output::{
-    SafeWarnings, display_api_transaction_details, display_calldata_decoded, display_eip712_hash,
-    display_full_tx, display_hashes, display_warnings,
+    SafeWarnings, display_api_transaction_details, display_eip712_hash, display_full_tx,
+    display_hashes, display_warnings,
 };
-use safe_utils::{CalldataDecoder, Eip712Hasher, FullTx, Of};
+use safe_utils::{Eip712Hasher, FullTx, Of};
 use std::fs;
 use tx_signing::*;
 use warn::check_suspicious_content;
@@ -143,6 +143,15 @@ fn main() {
                 // Display API transaction details
                 display_api_transaction_details(api_tx);
 
+                let dangerous_methods =
+                    ["addOwnerWithThreshold", "removeOwner", "swapOwner", "changeThreshold"];
+
+                if let Some(decoded) = &api_tx.data_decoded {
+                    if dangerous_methods.iter().any(|m| *m == decoded.method) {
+                        warnings.dangerous_methods = true;
+                    }
+                }
+
                 if let Err(e) = api::validate_safe_tx_hash(api_tx, &hashes.safe_tx_hash) {
                     warnings.argument_mismatches.push(e);
                 }
@@ -167,24 +176,6 @@ fn main() {
 
                 println!("\nNested transaction");
                 display_hashes(&nhashes);
-            }
-
-            // Predict ABI decode string
-            let calldata_decoder = CalldataDecoder::new(tx_data.data.clone());
-            if let Ok(decoded) = calldata_decoder.try_decode() {
-                println!();
-                display_calldata_decoded(&decoded);
-
-                let dangerous_methods =
-                    ["addOwnerWithThreshold", "removeOwner", "swapOwner", "changeThreshold"];
-
-                if decoded
-                    .options
-                    .iter()
-                    .any(|option| dangerous_methods.iter().any(|m| option.signature.starts_with(m)))
-                {
-                    warnings.dangerous_methods = true;
-                }
             }
 
             // Display warnings after the hashes
