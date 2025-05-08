@@ -68,7 +68,7 @@ safe-hash tx \
 ```
 > By default, it runs in online mode. To force offline, you must pass `--offline` flag and supply the `--to` address.
 
-### Nested Safe Address Example
+### Transaction Signing With Nested Safe Address
 
 ```bash
 safe-hash tx \
