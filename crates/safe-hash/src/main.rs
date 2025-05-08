@@ -119,23 +119,22 @@ fn main() {
             );
 
             let nested_tx_data: Option<TxInput> =
-                match (tx_args.nested_safe_address, tx_args.nested_safe_nonce) {
-                    (Some(_nested_safe_address), Some(_)) => {
-                        let data = format!("0xd4d9bdcd{}", hex::encode(hashes.safe_tx_hash));
-                        Some(TxInput::new(
-                            tx_args.safe_address,
-                            U256::ZERO,
-                            data,
-                            0,
-                            U256::ZERO,
-                            U256::ZERO,
-                            U256::ZERO,
-                            Address::ZERO,
-                            Address::ZERO,
-                            String::new(),
-                        ))
-                    }
-                    (_, _) => None,
+                if tx_args.nested_safe_address.is_some() && tx_args.nested_safe_nonce.is_none() {
+                    let data = format!("0xd4d9bdcd{}", hex::encode(hashes.safe_tx_hash));
+                    Some(TxInput::new(
+                        tx_args.safe_address,
+                        U256::ZERO,
+                        data,
+                        0,
+                        U256::ZERO,
+                        U256::ZERO,
+                        U256::ZERO,
+                        Address::ZERO,
+                        Address::ZERO,
+                        String::new(),
+                    ))
+                } else {
+                    None
                 };
 
             // Validate Safe Transaction Hash against API data if available
