@@ -120,10 +120,10 @@ fn main() {
 
             let nested_tx_data: Option<TxInput> =
                 match (tx_args.nested_safe_address, tx_args.nested_safe_nonce) {
-                    (Some(nested_safe_address), Some(_)) => {
+                    (Some(_nested_safe_address), Some(_)) => {
                         let data = format!("0xd4d9bdcd{}", hex::encode(hashes.safe_tx_hash));
                         Some(TxInput::new(
-                            nested_safe_address,
+                            tx_args.safe_address,
                             U256::ZERO,
                             data,
                             0,

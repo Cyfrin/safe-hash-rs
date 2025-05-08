@@ -175,3 +175,51 @@ fn test_eip712_hash_2() {
     assert!(stdout.contains(expected_domain_hash));
     assert!(stdout.contains(expected_message_hash));
 }
+
+#[test]
+fn test_nested_transaction_cli() {
+    // This test verifies that the CLI correctly calculates nested transaction hashes
+    let output = Command::new("cargo")
+        .arg("run")
+        .arg("-p")
+        .arg("safe-hash")
+        .arg("--")
+        .arg("tx")
+        .arg("--offline")
+        .arg("--chain")
+        .arg("sepolia")
+        .arg("--nonce")
+        .arg("0")
+        .arg("--safe-address")
+        .arg("0xbC7977C6694Ae2Ae8Ad96bb1C100a281D928b7DB")
+        .arg("--to")
+        .arg("0xdd13E55209Fd76AfE204dBda4007C227904f0a81")
+        .arg("--data")
+        .arg("0xa9059cbb00000000000000000000000036bffa3048d89fad48509c83fdb6a3410232f3d300000000000000000000000000000000000000000000000000038d7ea4c68000")
+        .arg("--safe-version")
+        .arg("1.4.1")
+        .arg("--nested-safe-address")
+        .arg("0x5031f5E2ed384978dca63306dc28A68a6Fc33e81")
+        .arg("--nested-safe-nonce")
+        .arg("1")
+        .output()
+        .expect("Failed to execute command");
+
+    // Assert that the command executed successfully
+    assert!(output.status.success(), "Command failed: {}", String::from_utf8_lossy(&output.stderr));
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    println!("{}", stdout);
+
+    // Check for main transaction hash
+    assert!(
+        stdout.contains("2aa2feb008064ccb8d6a31c43a6812d288107501505a04095ecdb2ebbeeaaffc"),
+        "Main transaction hash not found in output"
+    );
+
+    // Check for nested transaction hash
+    assert!(
+        stdout.contains("2c7a5de4d1bc03ca44ce122ff5feaa4241946737b42ee834a2881fcbe73bfbd6"),
+        "Nested transaction hash not found in output"
+    );
+}
