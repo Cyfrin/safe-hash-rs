@@ -2,6 +2,27 @@
 
 A tool to verify Safe{Wallet} transaction data and EIP-712 messages before signing.
 
+- [safe-hash - Verify Safe Wallet Transactions and Messages](#safe-hash---verify-safe-wallet-transactions-and-messages)
+- [Security practices for using `safe-hash`](#security-practices-for-using-safe-hash)
+- [Getting Started](#getting-started)
+  - [Installation](#installation)
+    - [Cyfrinup](#cyfrinup)
+    - [Shell (For Linux, Mac, WSL)](#shell-for-linux-mac-wsl)
+    - [Homebrew](#homebrew)
+    - [npm](#npm)
+- [Usage](#usage)
+  - [Help](#help)
+  - [Live Examples](#live-examples)
+    - [Transaction Signing](#transaction-signing)
+    - [Transaction Signing With Nested Safe Address, offline mode](#transaction-signing-with-nested-safe-address-offline-mode)
+    - [Message Signing](#message-signing)
+    - [EIP-712 encoding](#eip-712-encoding)
+    - [Example outputs](#example-outputs)
+  - [Trust Assumptions](#trust-assumptions)
+- [Community-Maintained User Interface Implementations](#community-maintained-user-interface-implementations)
+- [Acknowledgements](#acknowledgements)
+
+
 # Security practices for using `safe-hash`
 
 1. **Use a separate device for running this script**, totally different from what you use to send/sign your Safe{Wallet} transactions. This is to add some resilience in case your main device is compromised.
