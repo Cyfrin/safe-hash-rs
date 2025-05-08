@@ -44,15 +44,19 @@ To see more, run:
 safe-hash --help
 ```
 
-To see help in more detail, run:
+To see help in more detail for any subcommand, run:
 
 ```bash
 safe-hash tx --help
 ```
 
+```bash
+safe-hash typed --help
+```
+
 ## Examples
 
-### Transaction Signing Examples
+### Transaction Signing
 
 ```bash
 safe-hash tx \
@@ -64,7 +68,7 @@ safe-hash tx \
 ```
 > By default, it runs in online mode. To force offline, you must pass `--offline` flag and supply the `--to` address.
 
-### Message Signing Examples
+### Message Signing
 
 ```bash
 # Sign a message from a file
@@ -73,6 +77,14 @@ safe-hash msg \
   --safe-address 0x657ff0D4eC65D82b2bC1247b0a558bcd2f80A0f1 \
   --input-file test/test_message.txt \
   --safe-version 1.4.1
+```
+
+### EIP-712 encoding
+
+```bash
+safe-hash typed \
+  --file sepolia \
+  --safe-address test/pat_eip712_message.json
 ```
 
 ## Trust Assumptions
