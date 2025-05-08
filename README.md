@@ -68,6 +68,21 @@ safe-hash tx \
 ```
 > By default, it runs in online mode. To force offline, you must pass `--offline` flag and supply the `--to` address.
 
+### Nested Safe Address Example
+
+```bash
+safe-hash tx \
+   --safe-address 0xbC7977C6694Ae2Ae8Ad96bb1C100a281D928b7DB \
+   --nonce 0 \
+   --safe-version 1.4.1 \
+   --chain sepolia \
+   --to 0xdd13E55209Fd76AfE204dBda4007C227904f0a81 \
+   --data 0xa9059cbb00000000000000000000000036bffa3048d89fad48509c83fdb6a3410232f3d300000000000000000000000000000000000000000000000000038d7ea4c68000 \
+   --nested-safe-address 0x5031f5E2ed384978dca63306dc28A68a6Fc33e81 \
+   --nested-safe-nonce 1 \
+   --offline
+```
+
 ### Message Signing
 
 ```bash
