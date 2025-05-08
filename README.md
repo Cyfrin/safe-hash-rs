@@ -1,7 +1,7 @@
 # safe-hash - Verify Safe Wallet Transactions and Messages
 
 > [!CAUTION]
-> It is under development and is not fully tested. Please do not use it in production environments.
+> It is under development. Please use it at your own risk.
 
 ## Installation 
 
