@@ -26,6 +26,7 @@ fn main() {
     let args = CliArgs::parse();
     args.validate_safe_version();
     args.validate_chain();
+    args.validate_to_for_offline();
 
     match args.mode {
         Mode::Transaction(tx_args) => {

@@ -168,6 +168,15 @@ impl CliArgs {
             }
         }
     }
+
+    pub fn validate_to_for_offline(&self) {
+        if let Mode::Transaction(tx_args) = &self.mode {
+            if tx_args.to.is_none() && tx_args.offline {
+                eprintln!("--to <address> must be provided in offline mode");
+                std::process::exit(1);
+            }
+        }
+    }
 }
 
 #[cfg(test)]
