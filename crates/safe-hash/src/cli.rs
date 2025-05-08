@@ -172,7 +172,9 @@ impl CliArgs {
     pub fn validate_to_for_offline(&self) {
         if let Mode::Transaction(tx_args) = &self.mode {
             if tx_args.to.is_none() && tx_args.offline {
-                eprintln!("--to <address> must be provided in offline mode");
+                eprintln!(
+                    "--to <address> must be provided in offline mode. When API data cannot be fetched, you must provide the destination address manually."
+                );
                 std::process::exit(1);
             }
         }
