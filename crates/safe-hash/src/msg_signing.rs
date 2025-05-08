@@ -49,6 +49,7 @@ mod tests {
     use alloy::primitives::{Address, ChainId, FixedBytes, hex};
     use safe_utils::{Of, SafeWalletVersion};
     use std::{fs, str::FromStr};
+
     #[test]
     fn test_msg_signing_hashes() {
         // Create test inputs
@@ -89,6 +90,68 @@ mod tests {
         );
 
         // Assert outputs match expected values
+        assert_eq!(hashes.domain_hash, expected_domain, "Domain hash mismatch");
+        assert_eq!(hashes.message_hash, expected_message, "Message hash mismatch");
+        assert_eq!(hashes.safe_tx_hash, expected_safe, "Safe message hash mismatch");
+    }
+
+    #[test]
+    fn test_sign_in_with_ethereum_message() {
+        // Safe wallet address from the SIWE message
+        let safe_address = Address::from_str("0xfA3430d84324ABC9ac8AAf30B2D26260F5172ad0").unwrap();
+
+        // Create test arguments
+        let args = MessageArgs {
+            chain: "ethereum".to_string(),
+            input_file: "../../test/sign_in_message.txt".to_string(),
+            safe_address,
+            safe_version: SafeWalletVersion::new(1, 3, 0),
+        };
+
+        // Read the Sign-In with Ethereum message
+        let message = fs::read_to_string(&args.input_file)
+            .unwrap_or_else(|_| panic!("Failed to read message file: {}", args.input_file));
+
+        // Create message input and calculate hashes
+        let msg_data = MsgInput::new(message);
+        let chain_id = ChainId::of("ethereum").unwrap(); // Mainnet Chain ID (1)
+        let hashes = msg_signing_hashes(&msg_data, &args, chain_id);
+
+        // Expected hash values from the provided output
+        let expected_raw_message = FixedBytes::new(
+            hex::decode("48c93231cd6896df709cf4597a31a0688f985e64051312c8ddedde58059f743a")
+                .unwrap()
+                .try_into()
+                .unwrap(),
+        );
+
+        let expected_domain = FixedBytes::new(
+            hex::decode("0EAEFD0EB338F4E2E18C889139311CCAAE13B4148862802861E15AEF8A7C5DA0")
+                .unwrap()
+                .try_into()
+                .unwrap(),
+        );
+
+        let expected_message = FixedBytes::new(
+            hex::decode("EBED8FF562E11D962A53F3D8E030B2E3D9410B4AAA9E5B0484F8B37F4EF5B728")
+                .unwrap()
+                .try_into()
+                .unwrap(),
+        );
+
+        let expected_safe = FixedBytes::new(
+            hex::decode("3375c65e610610f556c0c988f6d720bfe0b32dfddb6a341cdba385673cbdf6f1")
+                .unwrap()
+                .try_into()
+                .unwrap(),
+        );
+
+        // Assert all hash values match expected values
+        assert_eq!(
+            hashes.raw_message_hash.unwrap(),
+            expected_raw_message,
+            "Raw message hash mismatch"
+        );
         assert_eq!(hashes.domain_hash, expected_domain, "Domain hash mismatch");
         assert_eq!(hashes.message_hash, expected_message, "Message hash mismatch");
         assert_eq!(hashes.safe_tx_hash, expected_safe, "Safe message hash mismatch");

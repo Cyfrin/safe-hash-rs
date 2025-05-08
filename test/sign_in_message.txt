@@ -1,0 +1,10 @@
+rewards.chain.link wants you to sign in with your Ethereum account:
+0xfA3430d84324ABC9ac8AAf30B2D26260F5172ad0
+
+
+URI: https://rewards.chain.link
+Version: 1
+Chain ID: 1
+Nonce: 0x587aff112e2a4ba316dcb93fcdfa4f5382d7eab66c2d9bb7ebe2b19ac4e075ea
+Issued At: 2025-05-08T16:37:09.140Z
+Expiration Time: 2025-05-08T16:52:09.140Z
