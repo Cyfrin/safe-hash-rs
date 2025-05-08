@@ -52,8 +52,6 @@ safe-hash tx --help
 
 ## Examples
 
-## Examples
-
 ### Transaction Signing Examples
 
 ```bash
