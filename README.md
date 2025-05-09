@@ -136,8 +136,8 @@ Add this to a file called `file.json`:
 Then run:
 ```bash
 safe-hash typed \
-  --file sepolia \
-  --safe-address file.json
+  --chain sepolia \
+  --file file.json
 ```
 
 ### Example outputs
