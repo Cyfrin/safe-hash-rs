@@ -24,6 +24,7 @@ const SAFE_SUPPORTED_CHAINS: &[(ChainId, &str)] = &[
     (84532, "base-sepolia"),
     (10200, "gnosis-chiado"),
     (1101, "polygon-zkevm"),
+    (43111, "hemi"),
 ];
 
 const SAFE_CHAIN_APIS: &[(&str, &str)] = &[
@@ -48,6 +49,7 @@ const SAFE_CHAIN_APIS: &[(&str, &str)] = &[
     ("base-sepolia", "https://safe-transaction-base-sepolia.safe.global"),
     ("gnosis-chiado", "https://safe-transaction-chiado.safe.global"),
     ("polygon-zkevm", "https://safe-transaction-zkevm.safe.global"),
+    ("hemi", "https://safe-transaction-hemi.safe.global"),
 ];
 
 pub fn get_all_supported_chain_names() -> Vec<String> {
