@@ -32,7 +32,7 @@ pub struct TransactionArgs {
     /// Chain
     /// - arbitrum, aurora, avalanche, base, blast, bsc, celo, ethereum, gnosis, linea,
     /// mantle, optimism, polygon, scroll, sepolia, worldchain, xlayer, zksync, base-sepolia,
-    /// gnosis-chiado, polygon-zkevm
+    /// gnosis-chiado, polygon-zkevm, hemi
     #[arg(short, long, required = true)]
     pub chain: String,
 
@@ -119,7 +119,7 @@ pub struct MessageArgs {
     /// Chain
     /// - arbitrum, aurora, avalanche, base, blast, bsc, celo, ethereum, gnosis, linea,
     /// mantle, optimism, polygon, scroll, sepolia, worldchain, xlayer, zksync, base-sepolia,
-    /// gnosis-chiado, polygon-zkevm
+    /// gnosis-chiado, polygon-zkevm, hemi
     #[arg(short, long, required = true)]
     pub chain: String,
 
