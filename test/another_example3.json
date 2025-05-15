@@ -1,0 +1,38 @@
+{
+  "domain": {
+    "name": "EmergencyUpgradeBoard",
+    "version": "1",
+    "chainId": 1,
+    "verifyingContract": "0xece8e30bfc92c2a8e11e6cb2e17b70868572e3f6"
+  },
+  "message": {
+    "id": "0x09a5358047d9d0898d14c31823e9ea544f5f33c280441d1f34d5cc6dafe7a055"
+  },
+  "primaryType": "ExecuteEmergencyUpgradeSecurityCouncil",
+  "types": {
+    "EIP712Domain": [
+      {
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "name": "version",
+        "type": "string"
+      },
+      {
+        "name": "chainId",
+        "type": "uint256"
+      },
+      {
+        "name": "verifyingContract",
+        "type": "address"
+      }
+    ],
+    "ExecuteEmergencyUpgradeSecurityCouncil": [
+      {
+        "name": "id",
+        "type": "bytes32"
+      }
+    ]
+  }
+}
