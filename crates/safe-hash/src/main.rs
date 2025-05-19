@@ -8,7 +8,7 @@ mod warn;
 
 use alloy::{
     hex::{self},
-    primitives::{Address, B256, ChainId, U256},
+    primitives::{Address, B256, ChainId, U256, keccak256},
 };
 use clap::Parser;
 use cli::{CliArgs, Eip712Args, Mode};
@@ -221,9 +221,17 @@ fn main() {
                     domain_hasher.hash()
                 };
 
+                let mut buf = [0u8; 66];
+                buf[0] = 0x19;
+                buf[1] = 0x01;
+                buf[2..34].copy_from_slice(domain_hash.as_slice());
+                buf[34..].copy_from_slice(msg_hash.as_slice());
+                let safe_hash = keccak256(buf);
+
                 println!("Safe UI values");
                 println!("Domain Hash {}", domain_hash);
                 println!("Message Hash {}", msg_hash);
+                println!("Safe Message Hash {}", safe_hash);
             }
         }
     }
