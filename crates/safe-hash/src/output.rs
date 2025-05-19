@@ -1,4 +1,7 @@
-use alloy::{hex, primitives::FixedBytes};
+use alloy::{
+    hex,
+    primitives::{B256, FixedBytes},
+};
 use cli_table::{Cell, Style, Table};
 use color_print::{cprintln, cstr};
 use safe_utils::EIP7127HashDetails;
@@ -172,14 +175,14 @@ pub fn display_warnings(warnings: &SafeWarnings) {
 }
 
 pub fn display_eip712_hash(hash: &EIP7127HashDetails) {
-    let mut table_rows = Vec::new();
+    println!("{:<24} {}", "EIP 712 Hash:", hash.eip_712_hash.clone());
+    println!("{:<24} {}", "Domain Hash:", hash.domain_hash.clone());
+    println!("{:<24} {}", "Message Hash:", hash.message_hash.clone());
+}
 
-    table_rows.push(vec![cstr!("<green>EIP 712 Hash</>").cell(), hash.eip_712_hash.clone().cell()]);
-    table_rows.push(vec![cstr!("<green>Domain Hash</>").cell(), hash.domain_hash.clone().cell()]);
-    table_rows.push(vec![cstr!("<green>Message Hash</>").cell(), hash.message_hash.clone().cell()]);
-
-    let table = table_rows.table().bold(true);
-
-    let table_display = table.display().unwrap();
-    println!("{}", table_display);
+pub fn display_safe_ui_values_for_eip712(domain_hash: B256, msg_hash: B256, safe_hash: B256) {
+    println!("\nSafe UI values: ");
+    println!("{:<24} {}", "Safe Message Hash:", safe_hash);
+    println!("{:<24} {}", "Domain Hash:", domain_hash);
+    println!("{:<24} {}", "Message Hash:", msg_hash);
 }

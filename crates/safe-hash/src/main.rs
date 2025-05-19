@@ -15,7 +15,7 @@ use cli::{CliArgs, Eip712Args, Mode};
 use msg_signing::*;
 use output::{
     SafeWarnings, display_api_transaction_details, display_eip712_hash, display_full_tx,
-    display_hashes, display_warnings,
+    display_hashes, display_safe_ui_values_for_eip712, display_warnings,
 };
 use safe_utils::{DomainHasher, Eip712Hasher, FullTx, MessageHasher, Of};
 use std::fs;
@@ -228,10 +228,7 @@ fn main() {
                 buf[34..].copy_from_slice(msg_hash.as_slice());
                 let safe_hash = keccak256(buf);
 
-                println!("Safe UI values");
-                println!("Domain Hash {}", domain_hash);
-                println!("Message Hash {}", msg_hash);
-                println!("Safe Message Hash {}", safe_hash);
+                display_safe_ui_values_for_eip712(domain_hash, msg_hash, safe_hash);
             }
         }
     }
