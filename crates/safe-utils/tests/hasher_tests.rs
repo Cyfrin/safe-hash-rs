@@ -127,6 +127,7 @@ fn test_eip712_hash() {
         .arg("typed")
         .arg("--file")
         .arg("../../test/pat_eip712_message.json")
+        .arg("--standalone")
         .output()
         .expect("Failed to execute command");
 
@@ -157,6 +158,7 @@ fn test_eip712_hash_2() {
         .arg("typed")
         .arg("--file")
         .arg("../../test/another_example.json")
+        .arg("--standalone")
         .output()
         .expect("Failed to execute command");
 
