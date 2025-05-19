@@ -7,17 +7,17 @@ mod tx_signing;
 mod warn;
 
 use alloy::{
-    hex,
-    primitives::{Address, ChainId, U256},
+    hex::{self},
+    primitives::{Address, B256, ChainId, U256},
 };
 use clap::Parser;
-use cli::{CliArgs, Mode};
+use cli::{CliArgs, Eip712Args, Mode};
 use msg_signing::*;
 use output::{
     SafeWarnings, display_api_transaction_details, display_eip712_hash, display_full_tx,
     display_hashes, display_warnings,
 };
-use safe_utils::{Eip712Hasher, FullTx, Of};
+use safe_utils::{DomainHasher, Eip712Hasher, FullTx, MessageHasher, Of};
 use std::fs;
 use tx_signing::*;
 use warn::check_suspicious_content;
@@ -27,6 +27,7 @@ fn main() {
     args.validate_safe_version();
     args.validate_chain();
     args.validate_to_for_offline();
+    args.validate_eip712_args();
 
     match args.mode {
         Mode::Transaction(tx_args) => {
@@ -196,7 +197,34 @@ fn main() {
                 panic!("Failed to read file: {}", eip712_args.file.as_os_str().to_string_lossy())
             });
             let msg_data = Eip712Hasher::new(message);
-            display_eip712_hash(&msg_data.hash().expect("Failed to EIP 712 Hash"));
+            let message = msg_data.hash().expect("Failed to EIP 712 hash");
+            display_eip712_hash(&message);
+
+            let Eip712Args { safe_version, chain, safe_address, standalone, .. } = eip712_args;
+
+            if !standalone {
+                let msg_hash = {
+                    let msg_hasher = MessageHasher::new_from_bytes(B256::from_slice(
+                        &hex::decode(message.eip_712_hash.clone()).unwrap(),
+                    ));
+
+                    msg_hasher.hash()
+                };
+
+                let domain_hash = {
+                    let domain_hasher = DomainHasher::new(
+                        safe_version.unwrap(),
+                        ChainId::of(&chain.unwrap()).unwrap(),
+                        safe_address.unwrap(),
+                    );
+
+                    domain_hasher.hash()
+                };
+
+                println!("Safe UI values");
+                println!("Domain Hash {}", domain_hash);
+                println!("Message Hash {}", msg_hash);
+            }
         }
     }
 }

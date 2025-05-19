@@ -3,6 +3,7 @@ use serde::Deserialize;
 
 use crate::Result;
 
+#[derive(Clone)]
 pub struct Eip712Hasher {
     typed_message_string: String,
 }

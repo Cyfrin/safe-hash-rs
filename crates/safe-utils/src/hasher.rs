@@ -38,7 +38,8 @@ pub struct SafeHasher {
 }
 
 pub struct MessageHasher {
-    message: String,
+    string_message: Option<String>,
+    bytes_message: Option<B256>,
 }
 
 #[derive(Debug)]
@@ -230,11 +231,20 @@ impl SafeHasher {
 
 impl MessageHasher {
     pub fn new(message: String) -> Self {
-        Self { message }
+        Self { string_message: Some(message), bytes_message: None }
+    }
+
+    pub fn new_from_bytes(message: B256) -> Self {
+        Self { bytes_message: Some(message), string_message: None }
     }
 
     pub fn raw_hash(&self) -> B256 {
-        eip191_hash_message(self.message.clone())
+        if let Some(string_message) = &self.string_message {
+            return eip191_hash_message(string_message);
+        } else if let Some(bytes_messge) = &self.bytes_message {
+            return bytes_messge.clone();
+        }
+        unimplemented!();
     }
 
     pub fn hash(&self) -> B256 {

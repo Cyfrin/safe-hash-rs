@@ -138,12 +138,44 @@ pub struct MessageArgs {
 
 #[derive(Parser, Debug)]
 pub struct Eip712Args {
+    /// Chain
+    /// - arbitrum, aurora, avalanche, base, blast, bsc, celo, ethereum, gnosis, linea,
+    /// mantle, optimism, polygon, scroll, sepolia, worldchain, xlayer, zksync, base-sepolia,
+    /// gnosis-chiado, polygon-zkevm
+    #[arg(short, long)]
+    pub chain: Option<String>,
+
+    /// Address of the safe address
+    #[arg(short = 's', long = "safe-address")]
+    pub safe_address: Option<Address>,
+
+    /// Safe Contract version
+    #[arg(short = 'u', long)]
+    pub safe_version: Option<SafeWalletVersion>,
+
+    #[arg(long)]
+    pub standalone: bool,
+
     /// File contiaing the JSON formatted EIP 712 spec
     #[arg(short, long, required = true)]
     pub file: PathBuf,
 }
 
 impl CliArgs {
+    pub fn validate_eip712_args(&self) {
+        if let Mode::Eip712(Eip712Args { chain, safe_address, safe_version, standalone, .. }) =
+            &self.mode
+        {
+            if *standalone {
+                return;
+            }
+            if chain.is_none() || safe_address.is_none() || safe_version.is_none() {
+                eprintln!("include `--standalone` flag");
+                std::process::exit(1);
+            }
+        }
+    }
+
     pub fn validate_safe_version(&self) {
         if let Mode::Transaction(tx_args) = &self.mode {
             if tx_args.safe_version < SafeWalletVersion::new(0, 1, 0) {
