@@ -15,7 +15,7 @@ use cli::{CliArgs, Eip712Args, Mode};
 use msg_signing::*;
 use output::{
     SafeWarnings, display_api_transaction_details, display_eip712_hash, display_full_tx,
-    display_hashes, display_safe_ui_values_for_eip712, display_warnings,
+    display_hashes, display_message_hashes, display_safe_ui_values_for_eip712, display_warnings,
 };
 use safe_utils::{DomainHasher, Eip712Hasher, FullTx, MessageHasher, Of};
 use std::fs;
@@ -188,9 +188,9 @@ fn main() {
 
             let message = fs::read_to_string(&msg_args.input_file)
                 .unwrap_or_else(|_| panic!("Failed to read message file: {}", msg_args.input_file));
-            let msg_data = MsgInput::new(message);
+            let msg_data = MsgInput::new(message.trim().to_string());
             let hashes = msg_signing_hashes(&msg_data, &msg_args, chain_id);
-            display_hashes(&hashes);
+            display_message_hashes(&hashes);
         }
         Mode::Eip712(eip712_args) => {
             let message = fs::read_to_string(&eip712_args.file).unwrap_or_else(|_| {

@@ -111,6 +111,18 @@ pub fn display_hashes(hashes: &SafeHashes) {
     );
 }
 
+pub fn display_message_hashes(hashes: &SafeHashes) {
+    if let Some(raw_hash) = hashes.raw_message_hash {
+        println!("{:<24} {}", "Safe Message:", hex::encode(raw_hash));
+    }
+    println!("{:<24} {}", "Safe Message Hash:", hex::encode(hashes.safe_tx_hash));
+    println!("{:<24} {}", "Domain Hash:", hex::encode(hashes.domain_hash));
+    println!("{:<24} {}", "Message Hash:", hex::encode(hashes.message_hash));
+    cprintln!(
+        "<bold>Verify the above value as the Safe Tx Hash when signing the message from the ledger.</bold>"
+    );
+}
+
 pub fn display_full_tx(full_tx_calldata: String, hash: String) {
     println!("{:<24} {}", "Full Tx Calldata:", full_tx_calldata);
     println!("{:<24} {}", "Full Tx Calldata Hash:", hash);
