@@ -19,7 +19,7 @@ color-print = "0.3"
 cli-table = "0.4"
 sty = "0.3"
 dirs = "6"
-safe-utils = { version = "0.0.16", path = "crates/safe-utils" }
+safe-utils = { version = "0.0.17", path = "crates/safe-utils" }
 target-triple = "0.1.4"
 
 # The profile that 'dist' will build with
