@@ -185,9 +185,8 @@ Verify the above value as the Safe Tx Hash when signing the message from the led
 > [!IMPORTANT]
 > Please be aware that user interface implementations may introduce additional trust assumptions, such as relying on `npm` dependencies that have not undergone thorough review. Always verify and cross-reference with the main [script](./safe_hashes.sh).
 
-- [`safeutils.openzeppelin.com`](https://safeutils.openzeppelin.com/):
-  - Code: [`openzeppelin/safe-utils`](https://github.com/openzeppelin/safe-utils)
-  - Authors: [`josepchetrit12`](https://github.com/josepchetrit12), [`xaler5`](https://github.com/xaler5)
+- [`Cyfrin Chain Tools`](https://tools.cyfrin.io/safe-hash)
+- [`safeutils.openzeppelin.com`](https://safeutils.openzeppelin.com/)
 
 # Acknowledgements
 
