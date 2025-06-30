@@ -75,7 +75,7 @@ fn main() {
                     U256::from_str_radix(&api_tx.gas_price, 10).unwrap_or(U256::ZERO),
                     api_tx.gas_token,
                     api_tx.refund_receiver,
-                    api_tx.signatures.clone(),
+                    api_tx.signatures.clone().unwrap_or(String::new()),
                 )
             } else {
                 // Use user-provided data for transaction
@@ -105,7 +105,7 @@ fn main() {
                     api_tx.gas_token,
                     api_tx.refund_receiver,
                     U256::from(api_tx.nonce),
-                    api_tx.signatures.clone(),
+                    api_tx.signatures.clone().unwrap_or(String::new()),
                 );
                 display_full_tx(full_tx.calldata(), full_tx.calldata_hash().unwrap_or_default());
             }

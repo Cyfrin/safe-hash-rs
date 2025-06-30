@@ -21,20 +21,22 @@ pub struct SafeTransaction {
     pub safe_tx_hash: String,
     pub confirmations_required: u64,
     pub confirmations: Vec<Confirmation>,
-    pub signatures: String,
+    pub signatures: Option<String>,
     pub proposer: Option<Address>,
     pub proposed_by_delegate: Option<Address>,
     pub execution_date: Option<String>,
     pub submission_date: String,
     pub modified: String,
-    pub block_number: u64,
+    pub block_number: Option<u64>,
     pub transaction_hash: Option<String>,
     pub executor: Option<Address>,
     pub is_executed: bool,
-    pub is_successful: bool,
-    pub eth_gas_price: String,
-    pub gas_used: u64,
-    pub fee: String,
+    pub is_successful: Option<bool>,
+    pub eth_gas_price: Option<String>,
+    pub max_fee_per_gas: Option<String>,
+    pub max_priority_fee_per_gas: Option<String>,
+    pub gas_used: Option<u64>,
+    pub fee: Option<String>,
     pub origin: String,
     pub trusted: bool,
 }
@@ -249,7 +251,7 @@ mod tests {
         assert_eq!(tx.confirmations_required, 2);
         assert_eq!(tx.confirmations.len(), 2);
         assert!(tx.is_executed);
-        assert!(tx.is_successful);
+        assert_eq!(tx.is_successful, Some(true));
     }
 
     fn create_test_tx() -> SafeTransaction {
@@ -269,20 +271,22 @@ mod tests {
             safe_tx_hash: "0x1234".to_string(),
             confirmations_required: 2,
             confirmations: vec![],
-            signatures: "".to_string(),
+            signatures: None,
             proposer: None,
             proposed_by_delegate: None,
             execution_date: None,
             submission_date: "".to_string(),
             modified: "".to_string(),
-            block_number: 1,
+            block_number: None,
             transaction_hash: None,
             executor: None,
             is_executed: false,
-            is_successful: false,
-            eth_gas_price: "".to_string(),
-            gas_used: 0,
-            fee: "".to_string(),
+            is_successful: None,
+            eth_gas_price: None,
+            max_fee_per_gas: None,
+            max_priority_fee_per_gas: None,
+            gas_used: None,
+            fee: None,
             origin: "".to_string(),
             trusted: false,
         }
