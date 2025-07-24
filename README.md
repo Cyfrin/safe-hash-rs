@@ -30,7 +30,7 @@ A tool to verify Safe{Wallet} transaction data and EIP-712 messages before signi
 2. **Manually verify what you expect, and then compare to what you get**. This tool shows you what you get from you wallet based on your input, you should compare it to what you expect to get
 3. **Understand the parameters you're signing**. This tool is useless if you don't know how to read the output! To get familiar, you can play the [wise-signer](https://wise-signer.cyfrin.io/) game to learn how calldata should be interpreted (with this tool too).
 4. **Read/watch these resources**:
-   1. [Video: Verifying Safe Wallet transactions](https://updraft.cyfrin.io/courses/wallets/wallets/verify-multi-sig-signatures?lesson_format=video)
+   1. [Video: Verifying Safe Wallet transactions](https://updraft.cyfrin.io/courses/advanced-web3-wallet-security/signer-advanced/verify-multi-sig-signatures)
    2. [How to perform basic transaction checks](https://help.safe.global/en/articles/276343-how-to-perform-basic-transactions-checks-on-safe-wallet)
    3. [How to verify a Safe TX on a hardware wallet](https://help.safe.global/en/articles/276344-how-to-verify-safe-wallet-transactions-on-a-hardware-wallet)
 5. **Understand the trust assumptions**. Even using this tool has trust assumptions, no matter what tool you use, be sure you understand the differences in trust. 
