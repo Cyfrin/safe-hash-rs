@@ -38,7 +38,7 @@ pub struct TransactionArgs {
 
     /// Transaction nonce of the safe address
     #[arg(short, long, required = true)]
-    pub nonce: u8,
+    pub nonce: u64,
 
     /// Address of the safe address
     #[arg(short = 's', long = "safe-address", required = true)]
@@ -70,7 +70,7 @@ pub struct TransactionArgs {
 
     /// Nested safe nonce
     #[arg(long)]
-    pub nested_safe_nonce: Option<u8>,
+    pub nested_safe_nonce: Option<u64>,
 
     #[arg(long, default_value_t = U256::ZERO)]
     pub safe_tx_gas: U256,
