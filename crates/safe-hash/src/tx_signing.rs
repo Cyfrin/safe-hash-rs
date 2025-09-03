@@ -58,7 +58,7 @@ impl TxInput {
 pub fn tx_signing_hashes(
     tx_data: &TxInput,
     safe_address: Address,
-    nonce: u8,
+    nonce: u64,
     chain_id: ChainId,
     safe_version: SafeWalletVersion,
 ) -> SafeHashes {
