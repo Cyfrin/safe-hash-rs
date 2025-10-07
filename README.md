@@ -106,7 +106,19 @@ podman run --rm --cap-drop ALL --read-only --tmpfs /tmp --network host localhost
 podman run --rm --cap-drop ALL --read-only --tmpfs /tmp --network host -v ./test:/app/input:ro,Z localhost/safe-hash:latest msg --chain sepolia --safe-address 0x657ff0D4eC65D82b2bC1247b0a558bcd2f80A0f1 --input-file /app/input/test_message.txt --safe-version 1.4.1
 ```
 
-#### Container Security Features
+#### Docker Compatibility
+
+The same Dockerfile works with Docker:
+
+```bash
+# Build with Docker
+docker build -t safe-hash:latest .
+
+# Run with Docker (basic help)
+docker run --rm --cap-drop ALL --read-only --tmpfs /tmp --network host safe-hash:latest --help
+
+# Mount files for processing with Docker
+docker run --rm --cap-drop ALL --read-only --tmpfs /tmp --network host -v ./test:/app/input:ro safe-hash:latest msg --chain sepolia --safe-address 0x657ff0D4eC65D82b2bC1247b0a558bcd2f80A0f1 --input-file /app/input/test_message.txt --safe-version 1.4.1
 
 The container setup includes several security enhancements:
 - **Minimal base image**: Uses Debian slim for reduced attack surface
