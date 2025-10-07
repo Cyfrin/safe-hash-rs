@@ -54,8 +54,8 @@ if [ $? -eq 0 ]; then
     
     echo -e "\n${GREEN}To run the container, use:${NC}"
     echo -e "  podman run --rm ${REGISTRY_NAME}/${IMAGE_NAME}:${IMAGE_TAG} --help"
-    echo -e "\n${GREEN}Or use the run script:${NC}"
-    echo -e "  ./scripts/podman-run.sh --help"
+    echo -e "\n${GREEN}Or use the safe-hash-rs script:${NC}"
+    echo -e "  ./scripts/safe-hash-rs --help"
 else
     echo -e "${RED}❌ Build failed!${NC}"
     exit 1

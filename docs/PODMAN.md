@@ -16,7 +16,7 @@ This document provides comprehensive instructions for running safe-hash-rs using
 
 2. **Run safe-hash:**
    ```bash
-   ./scripts/podman-run.sh --help
+   ./scripts/safe-hash-rs help
    ```
 
 ## Detailed Usage
@@ -41,11 +41,11 @@ podman build -t localhost/safe-hash:latest .
 #### Basic Usage
 
 ```bash
-# Show help
-./scripts/podman-run.sh --help
+# Show help (use 'help' subcommand to see safe-hash help)
+./scripts/safe-hash-rs help
 
 # Verify a transaction
-./scripts/podman-run.sh tx \
+./scripts/safe-hash-rs tx \
   --chain ethereum \
   --nonce 63 \
   --safe-address 0x1c694Fc3006D81ff4a56F97E1b99529066a23725 \
@@ -57,7 +57,7 @@ podman build -t localhost/safe-hash:latest .
 Mount a directory to access local files:
 
 ```bash
-./scripts/podman-run.sh -v ./test msg \
+./scripts/safe-hash-rs -v ./test msg \
   --chain sepolia \
   --safe-address 0x657ff0D4eC65D82b2bC1247b0a558bcd2f80A0f1 \
   --input-file /app/input/test_message.txt \
@@ -69,7 +69,7 @@ Mount a directory to access local files:
 For debugging or exploring:
 
 ```bash
-./scripts/podman-run.sh -i
+./scripts/safe-hash-rs -i
 ```
 
 ### Manual Podman Commands
@@ -164,7 +164,7 @@ podman run --rm \
 Run in interactive mode to debug issues:
 
 ```bash
-./scripts/podman-run.sh -i
+./scripts/safe-hash-rs -i
 # Inside container:
 safe-hash --help
 ```
@@ -217,7 +217,7 @@ if ! podman image exists localhost/safe-hash:latest; then
 fi
 
 # Run verification
-./scripts/podman-run.sh tx \
+./scripts/safe-hash-rs tx \
   --chain "${CHAIN:-ethereum}" \
   --nonce "${NONCE}" \
   --safe-address "${SAFE_ADDRESS}" \

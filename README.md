@@ -81,14 +81,14 @@ For enhanced security, you can run `safe-hash` in a container using Podman or Do
 
 2. Run safe-hash in the container:
 ```bash
-# Show help
-./scripts/podman-run.sh --help
+# Show help (note: use 'help' subcommand, not --help flag)
+./scripts/safe-hash-rs help
 
 # Verify a transaction
-./scripts/podman-run.sh tx --chain ethereum --nonce 63 --safe-address 0x1c694Fc3006D81ff4a56F97E1b99529066a23725 --safe-version 1.4.1
+./scripts/safe-hash-rs tx --chain ethereum --nonce 63 --safe-address 0x1c694Fc3006D81ff4a56F97E1b99529066a23725 --safe-version 1.4.1
 
 # Mount a directory to access local files
-./scripts/podman-run.sh -v ./test msg --chain sepolia --safe-address 0x657ff0D4eC65D82b2bC1247b0a558bcd2f80A0f1 --input-file /app/input/test_message.txt --safe-version 1.4.1
+./scripts/safe-hash-rs -v ./test msg --chain sepolia --safe-address 0x657ff0D4eC65D82b2bC1247b0a558bcd2f80A0f1 --input-file /app/input/test_message.txt --safe-version 1.4.1
 ```
 
 #### Manual Podman Commands
