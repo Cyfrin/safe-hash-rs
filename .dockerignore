@@ -1,0 +1,55 @@
+# Ignore build artifacts
+target/
+dist/
+
+# Ignore IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore git files
+.git/
+.gitignore
+
+# Note: Cargo.lock is included for reproducible builds
+
+# Ignore temporary files
+*.tmp
+*.temp
+
+# Ignore documentation build artifacts
+book/
+
+# Ignore CI/CD artifacts
+.github/
+
+# Ignore test artifacts
+*.profraw
+
+# Ignore local configuration
+.env
+.env.local
+
+# Ignore cargo registry cache
+.cargo/registry/
+.cargo/git/
+
+# Ignore benchmark results
+criterion/
+
+# Ignore log files
+*.log
+
+# Ignore backup files
+*.bak
+*.backup
+
+# Ignore package files
+*.tar.gz
+*.zip

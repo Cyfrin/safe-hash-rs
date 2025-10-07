@@ -26,7 +26,7 @@ A tool to verify Safe{Wallet} transaction data and EIP-712 messages before signi
 # Security practices for using `safe-hash`
 
 1. **Use a separate device for running this script**, totally different from what you use to send/sign your Safe{Wallet} transactions. This is to add some resilience in case your main device is compromised.
-   1. For extra security, run this inside a docker container or a secure operating system like Tails or Qubes OS.
+   1. For extra security, run this inside a docker container or a secure operating system like Tails or Qubes OS. **This project includes Podman/Docker support for enhanced security isolation.**
 2. **Manually verify what you expect, and then compare to what you get**. This tool shows you what you get from you wallet based on your input, you should compare it to what you expect to get
 3. **Understand the parameters you're signing**. This tool is useless if you don't know how to read the output! To get familiar, you can play the [wise-signer](https://wise-signer.cyfrin.io/) game to learn how calldata should be interpreted (with this tool too).
 4. **Read/watch these resources**:
@@ -66,6 +66,66 @@ brew install cyfrin/tap/safe-hash
 
 ```
 npm install -g @cyfrin/safe-hash
+```
+
+### Podman/Docker
+
+For enhanced security, you can run `safe-hash` in a container using Podman or Docker. This provides additional isolation and is especially recommended when running on potentially compromised systems.
+
+#### Quick Start with Podman
+
+1. Build the container image:
+```bash
+./scripts/podman-build.sh
+```
+
+2. Run safe-hash in the container:
+```bash
+# Show help
+./scripts/podman-run.sh --help
+
+# Verify a transaction
+./scripts/podman-run.sh tx --chain ethereum --nonce 63 --safe-address 0x1c694Fc3006D81ff4a56F97E1b99529066a23725 --safe-version 1.4.1
+
+# Mount a directory to access local files
+./scripts/podman-run.sh -v ./test msg --chain sepolia --safe-address 0x657ff0D4eC65D82b2bC1247b0a558bcd2f80A0f1 --input-file /app/input/test_message.txt --safe-version 1.4.1
+```
+
+#### Manual Podman Commands
+
+If you prefer to run commands manually:
+
+```bash
+# Build the image
+podman build -t localhost/safe-hash:latest .
+
+# Run with basic security
+podman run --rm --cap-drop ALL --read-only --tmpfs /tmp --network host localhost/safe-hash:latest --help
+
+# Mount files for processing
+podman run --rm --cap-drop ALL --read-only --tmpfs /tmp --network host -v ./test:/app/input:ro,Z localhost/safe-hash:latest msg --chain sepolia --safe-address 0x657ff0D4eC65D82b2bC1247b0a558bcd2f80A0f1 --input-file /app/input/test_message.txt --safe-version 1.4.1
+```
+
+#### Container Security Features
+
+The container setup includes several security enhancements:
+- **Minimal base image**: Uses Debian slim for reduced attack surface
+- **Non-root user**: Runs as unprivileged user inside container
+- **Read-only filesystem**: Container filesystem is mounted read-only
+- **Dropped capabilities**: All Linux capabilities are dropped
+- **Network isolation**: Can be run with restricted networking
+- **Resource limits**: Easily configurable resource constraints
+
+#### Docker Compatibility
+
+The same Dockerfile works with Docker:
+
+```bash
+# Build with Docker
+docker build -t safe-hash:latest .
+
+# Run with Docker
+docker run --rm --cap-drop ALL --read-only --tmpfs /tmp --network host safe-hash:latest --help
 ```
 
 # Usage
@@ -176,9 +236,14 @@ Verify the above value as the Safe Tx Hash when signing the message from the led
 ## Trust Assumptions
 * You trust this codebase
 * You trust the Safe Wallet contracts
-* You trust your OS
+* You trust your OS (or container runtime when using Podman/Docker)
 * You trust the [transaction service API](https://docs.safe.global/core-api/transaction-service-overview)
   * Unless you use the `--offline` flag.
+
+When using containers:
+* You trust the container runtime (Podman/Docker)
+* You trust the base container images (Rust and Debian)
+* The container provides additional isolation but doesn't eliminate all trust assumptions
 
 # Community-Maintained User Interface Implementations
 
